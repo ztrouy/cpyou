@@ -32,5 +32,8 @@ public class UserProfile
 
     public string IdentityUserId { get; set; }
 
+    // Navigation Properties
     public IdentityUser IdentityUser { get; set; }
+
+    public List<Build> Builds { get; set; }
 }
