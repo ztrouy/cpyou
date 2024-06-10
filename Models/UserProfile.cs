@@ -21,7 +21,7 @@ public class UserProfile
     [NotMapped]
     public string Email { get; set; }
 
-    public DateTime CreateDateTime { get; set; }
+    public DateTime DateCreated { get; set; }
 
     [DataType(DataType.Url)]
     [MaxLength(255)]

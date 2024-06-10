@@ -110,14 +110,14 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 FirstName = "Admina",
                 LastName = "Strator",
                 ImageLocation = "https://robohash.org/numquamutut.png?size=150x150&set=set1",
-                CreateDateTime = new DateTime(2022, 1, 25)
+                DateCreated = new DateTime(2022, 1, 25)
             },
              new UserProfile
             {
                 Id = 2,
                 FirstName = "John",
                 LastName = "Doe",
-                CreateDateTime = new DateTime(2023, 2, 2),
+                DateCreated = new DateTime(2023, 2, 2),
                 ImageLocation = "https://robohash.org/nisiautemet.png?size=150x150&set=set1",
                 IdentityUserId = "d8d76512-74f1-43bb-b1fd-87d3a8aa36df"
             },
@@ -126,7 +126,7 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 Id = 3,
                 FirstName = "Jane",
                 LastName = "Smith",
-                CreateDateTime = new DateTime(2022, 3, 15),
+                DateCreated = new DateTime(2022, 3, 15),
                 ImageLocation = "https://robohash.org/molestiaemagnamet.png?size=150x150&set=set1",
                 IdentityUserId = "a7d21fac-3b21-454a-a747-075f072d0cf3"
             },
@@ -135,7 +135,7 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 Id = 4,
                 FirstName = "Alice",
                 LastName = "Johnson",
-                CreateDateTime = new DateTime(2023, 6, 10),
+                DateCreated = new DateTime(2023, 6, 10),
                 ImageLocation = "https://robohash.org/deseruntutipsum.png?size=150x150&set=set1",
                 IdentityUserId = "c806cfae-bda9-47c5-8473-dd52fd056a9b"
             },
@@ -144,7 +144,7 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 Id = 5,
                 FirstName = "Bob",
                 LastName = "Williams",
-                CreateDateTime = new DateTime(2023, 5, 15),
+                DateCreated = new DateTime(2023, 5, 15),
                 ImageLocation = "https://robohash.org/quiundedignissimos.png?size=150x150&set=set1",
                 IdentityUserId = "9ce89d88-75da-4a80-9b0d-3fe58582b8e2"
             },
@@ -153,7 +153,7 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 Id = 6,
                 FirstName = "Eve",
                 LastName = "Davis",
-                CreateDateTime = new DateTime(2022, 10, 18),
+                DateCreated = new DateTime(2022, 10, 18),
                 ImageLocation = "https://robohash.org/hicnihilipsa.png?size=150x150&set=set1",
                 IdentityUserId = "d224a03d-bf0c-4a05-b728-e3521e45d74d"
             }
