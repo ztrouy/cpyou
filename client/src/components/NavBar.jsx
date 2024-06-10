@@ -12,9 +12,9 @@ export const NavBar = ({ loggedInUser, setLoggedInUser}) => {
             <AppBar position="static">
                 <Toolbar disableGutters sx={{justifyContent: "flex-end", pr: 1}}>
                     <Box flexGrow={1}>
-                        <Button sx={{color: "white", ml: 1}}>CP&You</Button>
+                        <Button sx={{color: "white", ml: 1}} href="/">CP&You</Button>
                     </Box>
-                    <Button variant="text" href="/" sx={{color: "white"}}>
+                    <Button variant="text" href="/builds" sx={{color: "white"}}>
                         Builds
                     </Button>
                     <Button variant="text" href="/" sx={{color: "white"}}>
