@@ -3,6 +3,7 @@ import { AuthorizedRoute } from "./auth/AuthorizedRoute";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import BuildsList from "./builds/BuildsList.jsx";
+import BuildDetails from "./builds/BuildDetails.jsx";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -25,6 +26,16 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
               </AuthorizedRoute>
             }
           />
+          <Route path=":buildId">
+            <Route 
+              index
+              element={
+                <AuthorizedRoute loggedInUser={loggedInUser}>
+                  <BuildDetails loggedInUser={loggedInUser}/>
+                </AuthorizedRoute>
+              }
+            />
+          </Route>
         </Route>
         <Route
           path="login"
