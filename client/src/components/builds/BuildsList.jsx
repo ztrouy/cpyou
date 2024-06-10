@@ -25,6 +25,9 @@ export const BuildsList = ({ loggedInUser }) => {
                                 <Chip 
                                     label={`$${b.totalPrice}`}
                                 />
+                                <Box flexGrow={1}>
+                                    <Typography textAlign={"end"}>{b.formattedDateCreated}</Typography>
+                                </Box>
                             </Box>
                             <Typography>{b.userProfile.userName}</Typography>
                             <Typography sx={{fontStyle: "italic"}}>{`${b.componentsQuantity} components`}</Typography>
