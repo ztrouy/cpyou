@@ -21,7 +21,7 @@ public class UserProfile
     [NotMapped]
     public string Email { get; set; }
 
-    public DateTime CreateDateTime { get; set; }
+    public DateTime DateCreated { get; set; }
 
     [DataType(DataType.Url)]
     [MaxLength(255)]
@@ -32,13 +32,8 @@ public class UserProfile
 
     public string IdentityUserId { get; set; }
 
+    // Navigation Properties
     public IdentityUser IdentityUser { get; set; }
 
-    public string FullName
-    {
-        get
-        {
-            return $"{FirstName} {LastName}";
-        }
-    }
+    public List<Build> Builds { get; set; }
 }

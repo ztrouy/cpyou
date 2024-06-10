@@ -21,7 +21,7 @@ public class UserProfileDTO
     [NotMapped]
     public string Email { get; set; }
 
-    public DateTime CreateDateTime { get; set; }
+    public DateTime DateCreated { get; set; }
 
     [DataType(DataType.Url)]
     [MaxLength(255)]
@@ -32,13 +32,10 @@ public class UserProfileDTO
 
     public string IdentityUserId { get; set; }
 
+    // Calculated Properties
+    public string FullName => $"{FirstName} {LastName}";
+
+    // Navigation Properties
     public IdentityUser IdentityUser { get; set; }
 
-    public string FullName
-    {
-        get
-        {
-            return $"{FirstName} {LastName}";
-        }
-    }
 }

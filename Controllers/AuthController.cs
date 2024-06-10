@@ -130,7 +130,7 @@ public class AuthController : ControllerBase
                 FirstName = registration.FirstName,
                 LastName = registration.LastName,
                 ImageLocation = registration.ImageLocation,
-                CreateDateTime = DateTime.Now,
+                DateCreated = DateTime.Now,
                 IdentityUserId = user.Id,
             });
             _dbContext.SaveChanges();
