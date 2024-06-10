@@ -20,9 +20,11 @@ public class BuildDTO
 
     // Calculated Properties
     public decimal TotalPrice => Components.Sum(c => c.Price * c.Quantity);
+    
     public string FormattedDateCreated => DateCreated.ToString("MMMM dd, yyyy");
 
     // Navigation Properties
     public UserProfileForBuildDTO UserProfile { get; set; }
+
     public List<ComponentForBuildDTO> Components { get; set; }
 }

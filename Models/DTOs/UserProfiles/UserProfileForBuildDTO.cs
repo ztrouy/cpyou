@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace CPYou.Models.DTOs;
 public class UserProfileForBuildDTO
 {
@@ -13,11 +11,6 @@ public class UserProfileForBuildDTO
 
     public string ImageLocation { get; set; }
 
-    public string FullName
-    {
-        get
-        {
-            return $"{FirstName} {LastName}";
-        }
-    }
+    // Calculated Properties
+    public string FullName => $"{FirstName} {LastName}";
 }

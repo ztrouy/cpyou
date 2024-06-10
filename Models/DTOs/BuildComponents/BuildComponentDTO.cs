@@ -15,5 +15,6 @@ public class BuildComponentDTO
 
     // Navigation Properties
     public BuildDTO Build { get; set; }
+    
     public ComponentDTO Component { get; set; }
 }
