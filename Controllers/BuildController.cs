@@ -84,6 +84,11 @@ public class BuildController : ControllerBase
             })
             .SingleOrDefault(b => b.Id == id);
         
+        if (buildDTO == null)
+        {
+            return NotFound();
+        }
+
         return Ok(buildDTO);
     }
 }
