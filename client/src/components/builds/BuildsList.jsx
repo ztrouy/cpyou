@@ -14,7 +14,7 @@ export const BuildsList = ({ loggedInUser }) => {
     }
 
     return (
-        <Container sx={{display: "flex", justifyContent: "center"}}>
+        <Container sx={{display: "flex", justifyContent: "center", mb: 5}}>
             <Box sx={{width: 1, maxWidth: "800px"}}>
                 <Typography variant="h3" sx={{my: 2}}>Builds</Typography>
                 <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
