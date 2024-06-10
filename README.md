@@ -34,7 +34,7 @@ Navigate to the cloned directory and run the following
 dotnet user-secrets init
 ```
 ```
-dotnet user-secrets set 'HouseRulesDbConnectionString' 'Host=localhost;Port=5432;Username=postgres;Password=<your_postgresql_password>;Database=HouseRules'
+dotnet user-secrets set 'CPYouDbConnectionString' 'Host=localhost;Port=5432;Username=postgres;Password=<your_postgresql_password>;Database=CPYou'
 ```
 ```
 dotnet user-secrets set AdminPassword password
