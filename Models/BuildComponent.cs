@@ -15,5 +15,6 @@ public class BuildComponent
 
     // Navigation Properties
     public Build Build { get; set; }
+    
     public Component Component { get; set; }
 }
