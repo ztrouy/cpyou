@@ -1,10 +1,12 @@
 import { Box, Button, Chip, CircularProgress, Container, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getSingleBuild } from "../../managers/buildManager.js"
+import { deleteBuild, getSingleBuild } from "../../managers/buildManager.js"
+import DeleteModal from "../modals/DeleteModal.jsx"
 
 export const BuildDetails = ({ loggedInUser }) => {
     const [build, setBuild] = useState(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     const { buildId } = useParams()
 
@@ -13,6 +15,16 @@ export const BuildDetails = ({ loggedInUser }) => {
     useEffect(() => {
         getSingleBuild(buildId).then(setBuild)
     }, [buildId])
+
+    const toggleDeleteModal = () => {
+        setIsModalOpen(!isModalOpen)
+    }
+
+    const handleDelete = () => {
+        deleteBuild(buildId).then(() => {
+            navigate("/builds")
+        })
+    }
     
     if (!build) {
         return <CircularProgress/>
@@ -43,10 +55,16 @@ export const BuildDetails = ({ loggedInUser }) => {
                 {build.userProfileId == loggedInUser.id && (
                     <Box sx={{display: "flex", justifyContent: "end", mt: 1, gap: 1}}>
                         <Button variant="contained" onClick={() => navigate("edit")}>Edit</Button>
-                        <Button variant="contained">Delete</Button>
+                        <Button variant="contained" onClick={() => toggleDeleteModal()}>Delete</Button>
                     </Box>
                 )}
             </Paper>
+            <DeleteModal 
+                isOpen={isModalOpen}
+                toggle={toggleDeleteModal}
+                confirmDelete={handleDelete}
+                typeName={"Build"}
+            />
         </Container>
     )
 }
