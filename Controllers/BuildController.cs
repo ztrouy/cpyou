@@ -28,6 +28,7 @@ public class BuildController : ControllerBase
             .ThenInclude(up => up.IdentityUser)
             .Include(b => b.BuildComponents)
             .ThenInclude(bc => bc.Component)
+            .OrderByDescending(b => b.DateCreated)
             .Select(b => new BuildForListDTO()
             {
                 Id = b.Id,
