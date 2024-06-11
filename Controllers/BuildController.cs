@@ -92,6 +92,39 @@ public class BuildController : ControllerBase
         return Ok(buildDTO);
     }
 
+    [HttpGet("{id}/edit")]
+    [Authorize]
+    public IActionResult GetSingleForEdit(int id)
+    {
+        BuildForEditFormDTO buildDTO = _dbContext.Builds
+            .Include(b => b.UserProfile)
+            .Include(b => b.BuildComponents)
+            .ThenInclude(bc => bc.Component)
+            .Select(b => new BuildForEditFormDTO()
+            {
+                Id = b.Id,
+                UserProfileId = b.UserProfileId,
+                Name = b.Name,
+                Content = b.Content,
+                Components = b.BuildComponents.Select(bc => new BuildComponentForEditFormDTO()
+                {
+                    Id = bc.ComponentId,
+                    Name = bc.Component.Name,
+                    Price = bc.Component.Price,
+                    Quantity = bc.Quantity
+                }).ToList()
+                
+            })
+            .SingleOrDefault(b => b.Id == id);
+        
+        if (buildDTO == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(buildDTO);
+    }
+
     [HttpPost]
     [Authorize]
     public IActionResult Create(BuildCreateDTO build)
