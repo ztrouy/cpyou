@@ -35,7 +35,7 @@ export const BuildForm = ({ loggedInUser }) => {
         const copy = [...chosenComponents]
         let componentCopy = copy.find(cc => cc == chosenComponent)
         
-        if (quantity == 0) {
+        if (quantity <= 0) {
             const index = copy.indexOf(componentCopy)
             copy.splice(index, 1)
         } else {
