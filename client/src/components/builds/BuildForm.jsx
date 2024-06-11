@@ -25,6 +25,10 @@ export const BuildForm = ({ loggedInUser }) => {
 
     useEffect(() => {
         if (importedBuild) {
+            if (importedBuild.userProfileId != loggedInUser.id) {
+                navigate(`/builds/${buildId}`)
+            }
+            
             setName(importedBuild.name)
             setContent(importedBuild.content)
             setChosenComponents(importedBuild.components)
