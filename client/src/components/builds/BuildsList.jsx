@@ -1,4 +1,4 @@
-import { Badge, Box, ButtonBase, Chip, CircularProgress, Container, Paper, Typography } from "@mui/material"
+import { Box, ButtonBase, Chip, CircularProgress, Container, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { getBuilds } from "../../managers/buildManager.js"
 import { useNavigate } from "react-router-dom"
@@ -28,7 +28,7 @@ export const BuildsList = ({ loggedInUser }) => {
                                     <Typography variant="h5">{b.name}</Typography>
                                 </ButtonBase>
                                 <Chip 
-                                    label={`$${b.totalPrice}`}
+                                    label={b.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}
                                 />
                                 <Box flexGrow={1}>
                                     <Typography textAlign={"end"}>{b.formattedDateCreated}</Typography>

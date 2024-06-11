@@ -19,7 +19,7 @@ export const NavBar = ({ loggedInUser, setLoggedInUser}) => {
                             <Button variant="text" href="/builds" sx={{color: "white"}}>
                                 Builds
                             </Button>
-                            <Button variant="text" href="/" sx={{color: "white"}}>
+                            <Button variant="text" href="/builds/new" sx={{color: "white"}}>
                                 New Build
                             </Button>
                             <Button onClick={e => handleLogout(e)} variant="text" href="/login" sx={{color: "white"}}>

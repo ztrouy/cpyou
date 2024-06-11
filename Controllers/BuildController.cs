@@ -91,4 +91,72 @@ public class BuildController : ControllerBase
 
         return Ok(buildDTO);
     }
+
+    [HttpPost]
+    [Authorize]
+    public IActionResult Create(BuildCreateDTO build)
+    {
+        UserProfile foundUserProfile = _dbContext.UserProfiles.SingleOrDefault(up => up.Id == build.UserProfileId);
+        if (foundUserProfile == null)
+        {
+            return BadRequest("No User exists with that Id!");
+        }
+        
+        Build newBuild = new Build()
+        {
+            Name = build.Name,
+            Content = build.Content,
+            UserProfileId = build.UserProfileId,
+            DateCreated = DateTime.Now
+        };
+
+        _dbContext.Builds.Add(newBuild);
+        _dbContext.SaveChanges();
+
+        foreach (BuildComponentCreateDTO bc in build.Components)
+        {
+            BuildComponent buildComponent = new BuildComponent()
+            {
+                BuildId = newBuild.Id,
+                ComponentId = bc.ComponentId,
+                Quantity = bc.Quantity
+            };
+
+            _dbContext.BuildComponents.Add(buildComponent);
+        }
+
+        _dbContext.SaveChanges();
+
+        BuildForBuildDetailsDTO createdBuild = _dbContext.Builds
+            .Include(b => b.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
+            .Include(b => b.BuildComponents)
+            .ThenInclude(bc => bc.Component)
+            .Select(b => new BuildForBuildDetailsDTO()
+            {
+                Id = b.Id,
+                UserProfileId = b.UserProfileId,
+                Name = b.Name,
+                Content = b.Content,
+                DateCreated = b.DateCreated,
+                Components = b.BuildComponents.Select(bc => new ComponentForBuildDTO()
+                {
+                    Id = bc.Component.Id,
+                    Name = bc.Component.Name,
+                    Price = bc.Component.Price,
+                    Quantity = bc.Quantity
+                }).ToList(),
+                UserProfile = new UserProfileForBuildDTO()
+                {
+                    Id = b.UserProfile.Id,
+                    FirstName = b.UserProfile.FirstName,
+                    LastName = b.UserProfile.LastName,
+                    UserName = b.UserProfile.IdentityUser.UserName,
+                    ImageLocation = b.UserProfile.ImageLocation
+                }
+            })
+            .SingleOrDefault(b => b.Id == newBuild.Id);
+        
+        return Created($"/builds/{createdBuild.Id}", createdBuild);
+    }
 }

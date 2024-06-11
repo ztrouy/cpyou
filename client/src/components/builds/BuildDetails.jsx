@@ -33,10 +33,10 @@ export const BuildDetails = ({ loggedInUser }) => {
                                 <Chip label={c.quantity}/>
                                 <Typography>{c.name}</Typography>
                             </Box>
-                            <Typography>{`$${c.price * c.quantity}`}</Typography>
+                            <Typography>{(c.price * c.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
                         </Box>
                     ))}
-                    <Typography textAlign={"end"} fontWeight={"bold"}>{`$${build.totalPrice}`}</Typography>
+                    <Typography textAlign={"end"} fontWeight={"bold"}>{build.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
                 </Box>
                 <Box sx={{display: "flex", justifyContent: "end", mt: 1, gap: 1}}>
                     <Button variant="contained">Edit</Button>
