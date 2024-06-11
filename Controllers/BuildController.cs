@@ -192,4 +192,45 @@ public class BuildController : ControllerBase
         
         return Created($"/builds/{createdBuild.Id}", createdBuild);
     }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public IActionResult Update(int id, BuildEditDTO build)
+    {
+        Build buildToEdit = _dbContext.Builds.SingleOrDefault(b => b.Id == id);
+        if (buildToEdit == null)
+        {
+            return BadRequest("No Build exists with that Id!");
+        }
+        
+        buildToEdit.Name = build.Name;
+        buildToEdit.Content = build.Content;
+
+        List<BuildComponent> buildComponentsToDelete = _dbContext.BuildComponents
+            .Where(bc => bc.BuildId == id)
+            .ToList();
+
+        foreach (BuildComponent bc in buildComponentsToDelete)
+        {
+            _dbContext.BuildComponents.Remove(bc);
+        }
+
+        _dbContext.SaveChanges();
+
+        foreach (BuildComponentCreateDTO bc in build.Components)
+        {
+            BuildComponent buildComponent = new BuildComponent()
+            {
+                BuildId = id,
+                ComponentId = bc.ComponentId,
+                Quantity = bc.Quantity
+            };
+
+            _dbContext.BuildComponents.Add(buildComponent);
+        }
+
+        _dbContext.SaveChanges();
+        
+        return NoContent();
+    }
 }
