@@ -234,4 +234,20 @@ public class BuildController : ControllerBase
         
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public IActionResult Delete(int id)
+    {
+        Build buildToDelete = _dbContext.Builds.SingleOrDefault(b => b.Id == id);
+        if (buildToDelete == null)
+        {
+            return NotFound("No Build found with that Id");
+        }
+
+        _dbContext.Builds.Remove(buildToDelete);
+        _dbContext.SaveChanges();
+
+        return NoContent();
+    }
 }
