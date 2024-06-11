@@ -24,15 +24,16 @@ export const BuildForm = ({ loggedInUser }) => {
     }, [buildId])
 
     useEffect(() => {
-        if (importedBuild) {
-            if (importedBuild.userProfileId != loggedInUser.id) {
-                navigate(`/builds/${buildId}`)
-            }
-            
-            setName(importedBuild.name)
-            setContent(importedBuild.content)
-            setChosenComponents(importedBuild.components)
+        if (!importedBuild) return
+
+        if (importedBuild.userProfileId != loggedInUser.id) {
+            navigate(`/builds/${buildId}`)
+            return
         }
+
+        setName(importedBuild.name)
+        setContent(importedBuild.content)
+        setChosenComponents(importedBuild.components)
     }, [importedBuild])
     
     const handleSelection = (e) => {
