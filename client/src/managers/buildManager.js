@@ -23,3 +23,15 @@ export const createBuild = (build) => {
 
     return fetch(_apiUrl, postOptions).then(res => res.headers.get("Location"))
 }
+
+export const updateBuild = (buildId, build) => {
+    const putOptions = {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(build)
+    }
+
+    return fetch(`${_apiUrl}/${buildId}`, putOptions)
+}
