@@ -1,20 +1,35 @@
 import { Box, Button, Container, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { getComponents } from "../../managers/componentManager.js"
-import { useNavigate } from "react-router-dom"
-import { createBuild } from "../../managers/buildManager.js"
+import { useNavigate, useParams } from "react-router-dom"
+import { createBuild, getSingleBuildForEdit } from "../../managers/buildManager.js"
 
 export const BuildForm = ({ loggedInUser }) => {
     const [name, setName] = useState("")
     const [content, setContent] = useState("")
     const [components, setComponents] = useState([])
     const [chosenComponents, setChosenComponents] = useState([])
+    const [importedBuild, setImportedBuild] = useState(null)
+
+    const { buildId } = useParams()
 
     const navigate = useNavigate()
     
     useEffect(() => {
         getComponents().then(setComponents)
-    }, [])
+        
+        if (buildId) {
+            getSingleBuildForEdit(buildId).then(setImportedBuild)
+        }
+    }, [buildId])
+
+    useEffect(() => {
+        if (importedBuild) {
+            setName(importedBuild.name)
+            setContent(importedBuild.content)
+            setChosenComponents(importedBuild.components)
+        }
+    }, [importedBuild])
     
     const handleSelection = (e) => {
         const copy = [...chosenComponents]
