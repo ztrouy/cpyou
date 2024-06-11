@@ -20,6 +20,7 @@ public class ComponentController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Get()
     {
         List<ComponentNoNavDTO> componentDTOs = _dbContext.Components

@@ -93,6 +93,7 @@ public class BuildController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public IActionResult Create(BuildCreateDTO build)
     {
         UserProfile foundUserProfile = _dbContext.UserProfiles.SingleOrDefault(up => up.Id == build.UserProfileId);
