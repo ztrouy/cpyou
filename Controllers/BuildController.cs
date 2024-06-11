@@ -28,6 +28,7 @@ public class BuildController : ControllerBase
             .ThenInclude(up => up.IdentityUser)
             .Include(b => b.BuildComponents)
             .ThenInclude(bc => bc.Component)
+            .OrderByDescending(b => b.DateCreated)
             .Select(b => new BuildForListDTO()
             {
                 Id = b.Id,
@@ -81,6 +82,39 @@ public class BuildController : ControllerBase
                     UserName = b.UserProfile.IdentityUser.UserName,
                     ImageLocation = b.UserProfile.ImageLocation
                 }
+            })
+            .SingleOrDefault(b => b.Id == id);
+        
+        if (buildDTO == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(buildDTO);
+    }
+
+    [HttpGet("{id}/edit")]
+    [Authorize]
+    public IActionResult GetSingleForEdit(int id)
+    {
+        BuildForEditFormDTO buildDTO = _dbContext.Builds
+            .Include(b => b.UserProfile)
+            .Include(b => b.BuildComponents)
+            .ThenInclude(bc => bc.Component)
+            .Select(b => new BuildForEditFormDTO()
+            {
+                Id = b.Id,
+                UserProfileId = b.UserProfileId,
+                Name = b.Name,
+                Content = b.Content,
+                Components = b.BuildComponents.Select(bc => new BuildComponentForEditFormDTO()
+                {
+                    Id = bc.ComponentId,
+                    Name = bc.Component.Name,
+                    Price = bc.Component.Price,
+                    Quantity = bc.Quantity
+                }).ToList()
+                
             })
             .SingleOrDefault(b => b.Id == id);
         
@@ -158,5 +192,46 @@ public class BuildController : ControllerBase
             .SingleOrDefault(b => b.Id == newBuild.Id);
         
         return Created($"/builds/{createdBuild.Id}", createdBuild);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public IActionResult Update(int id, BuildEditDTO build)
+    {
+        Build buildToEdit = _dbContext.Builds.SingleOrDefault(b => b.Id == id);
+        if (buildToEdit == null)
+        {
+            return BadRequest("No Build exists with that Id!");
+        }
+        
+        buildToEdit.Name = build.Name;
+        buildToEdit.Content = build.Content;
+
+        List<BuildComponent> buildComponentsToDelete = _dbContext.BuildComponents
+            .Where(bc => bc.BuildId == id)
+            .ToList();
+
+        foreach (BuildComponent bc in buildComponentsToDelete)
+        {
+            _dbContext.BuildComponents.Remove(bc);
+        }
+
+        _dbContext.SaveChanges();
+
+        foreach (BuildComponentCreateDTO bc in build.Components)
+        {
+            BuildComponent buildComponent = new BuildComponent()
+            {
+                BuildId = id,
+                ComponentId = bc.ComponentId,
+                Quantity = bc.Quantity
+            };
+
+            _dbContext.BuildComponents.Add(buildComponent);
+        }
+
+        _dbContext.SaveChanges();
+        
+        return NoContent();
     }
 }

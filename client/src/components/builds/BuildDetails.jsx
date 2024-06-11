@@ -1,12 +1,14 @@
 import { Box, Button, Chip, CircularProgress, Container, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { getSingleBuild } from "../../managers/buildManager.js"
 
 export const BuildDetails = ({ loggedInUser }) => {
     const [build, setBuild] = useState(null)
 
     const { buildId } = useParams()
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         getSingleBuild(buildId).then(setBuild)
@@ -38,10 +40,12 @@ export const BuildDetails = ({ loggedInUser }) => {
                     ))}
                     <Typography textAlign={"end"} fontWeight={"bold"}>{build.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
                 </Box>
-                <Box sx={{display: "flex", justifyContent: "end", mt: 1, gap: 1}}>
-                    <Button variant="contained">Edit</Button>
-                    <Button variant="contained">Delete</Button>
-                </Box>
+                {build.userProfileId == loggedInUser.id && (
+                    <Box sx={{display: "flex", justifyContent: "end", mt: 1, gap: 1}}>
+                        <Button variant="contained" onClick={() => navigate("edit")}>Edit</Button>
+                        <Button variant="contained">Delete</Button>
+                    </Box>
+                )}
             </Paper>
         </Container>
     )

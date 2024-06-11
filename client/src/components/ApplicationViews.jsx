@@ -36,6 +36,14 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
                 </AuthorizedRoute>
               }
             />
+            <Route 
+              path="edit"
+              element={
+                <AuthorizedRoute loggedInUser={loggedInUser}>
+                  <BuildForm loggedInUser={loggedInUser}/>
+                </AuthorizedRoute>
+              }
+            />
           </Route>
           <Route path="new">
               <Route 

@@ -1,20 +1,40 @@
 import { Box, Button, Container, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { getComponents } from "../../managers/componentManager.js"
-import { useNavigate } from "react-router-dom"
-import { createBuild } from "../../managers/buildManager.js"
+import { useNavigate, useParams } from "react-router-dom"
+import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
 
 export const BuildForm = ({ loggedInUser }) => {
     const [name, setName] = useState("")
     const [content, setContent] = useState("")
     const [components, setComponents] = useState([])
     const [chosenComponents, setChosenComponents] = useState([])
+    const [importedBuild, setImportedBuild] = useState(null)
+
+    const { buildId } = useParams()
 
     const navigate = useNavigate()
     
     useEffect(() => {
         getComponents().then(setComponents)
-    }, [])
+        
+        if (buildId) {
+            getSingleBuildForEdit(buildId).then(setImportedBuild)
+        }
+    }, [buildId])
+
+    useEffect(() => {
+        if (!importedBuild) return
+
+        if (importedBuild.userProfileId != loggedInUser.id) {
+            navigate(`/builds/${buildId}`)
+            return
+        }
+
+        setName(importedBuild.name)
+        setContent(importedBuild.content)
+        setChosenComponents(importedBuild.components)
+    }, [importedBuild])
     
     const handleSelection = (e) => {
         const copy = [...chosenComponents]
@@ -60,12 +80,16 @@ export const BuildForm = ({ loggedInUser }) => {
             })
         }
 
-        createBuild(build).then(url => navigate(url))
+        if (!buildId) {
+            createBuild(build).then(url => navigate(url))
+        } else {
+            updateBuild(buildId, build).then(() => navigate(`/builds/${buildId}`))
+        }
     }
 
     return (
         <Container>
-            <Paper elevation={5} sx={{p: 2, mt: 5}}>
+            <Paper elevation={5} sx={{p: 2, my: 5}}>
                 <Box
                     component={"form"} 
                     onSubmit={handleSubmit} 
@@ -123,7 +147,8 @@ export const BuildForm = ({ loggedInUser }) => {
                     <Typography fontWeight={"bold"} alignSelf={"end"}>
                         {`Total: ${chosenComponents.reduce((n, {price, quantity}) => n + (price * quantity), 0).toLocaleString("en-US", {style:"currency", currency:"USD"})}`}
                     </Typography>
-                    <Box sx={{display: "flex", justifyContent: "end"}}>
+                    <Box sx={{display: "flex", justifyContent: "end", gap: 1}}>
+                        {buildId && <Button variant="contained" onClick={() => navigate(`/builds/${buildId}`)}>Cancel</Button>}
                         <Button variant="contained" type="submit">Submit</Button>
                     </Box>
                 </Box>
