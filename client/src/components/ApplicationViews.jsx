@@ -4,6 +4,7 @@ import Login from "./auth/Login";
 import Register from "./auth/Register";
 import BuildsList from "./builds/BuildsList.jsx";
 import BuildDetails from "./builds/BuildDetails.jsx";
+import BuildForm from "./builds/BuildForm.jsx";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -35,6 +36,16 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
                 </AuthorizedRoute>
               }
             />
+          </Route>
+          <Route path="new">
+              <Route 
+                index
+                element={
+                  <AuthorizedRoute loggedInUser={loggedInUser}>
+                    <BuildForm loggedInUser={loggedInUser}/>
+                  </AuthorizedRoute>
+                }
+              />
           </Route>
         </Route>
         <Route
