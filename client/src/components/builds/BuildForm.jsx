@@ -96,7 +96,11 @@ export const BuildForm = ({ loggedInUser }) => {
                     sx={{display: "flex", flexDirection: "column", gap: 2}}
                     autoComplete="off"
                 >
-                    <Typography variant="h4">New Build</Typography>
+                    {!buildId ? (
+                        <Typography variant="h4">New Build</Typography>
+                    ) : (
+                        <Typography variant="h4">Edit Build</Typography>
+                    )}
                     <TextField 
                         label="Build Name"
                         type="text"
