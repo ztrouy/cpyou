@@ -28,7 +28,7 @@ export const BuildsList = ({ loggedInUser }) => {
                                     <Typography variant="h5">{b.name}</Typography>
                                 </ButtonBase>
                                 <Chip 
-                                    label={`$${b.totalPrice}`}
+                                    label={b.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}
                                 />
                                 <Box flexGrow={1}>
                                     <Typography textAlign={"end"}>{b.formattedDateCreated}</Typography>
