@@ -8,6 +8,10 @@ export const getSingleBuild = (buildId) => {
     return fetch(`${_apiUrl}/${buildId}`).then(res => res.json())
 }
 
+export const getSingleBuildForEdit = (buildId) => {
+    return fetch(`${_apiUrl}/${buildId}/edit`).then(res => res.json())
+}
+
 export const createBuild = (build) => {
     const postOptions = {
         method: "POST",
