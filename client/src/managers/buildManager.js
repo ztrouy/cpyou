@@ -35,3 +35,9 @@ export const updateBuild = (buildId, build) => {
 
     return fetch(`${_apiUrl}/${buildId}`, putOptions)
 }
+
+export const deleteBuild = (buildId) => {
+    const deleteOptions = {method: "DELETE"}
+
+    return fetch(`${_apiUrl}/${buildId}`, deleteOptions)
+}
