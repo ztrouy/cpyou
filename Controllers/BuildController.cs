@@ -60,6 +60,12 @@ public class BuildController : ControllerBase
             .ThenInclude(up => up.IdentityUser)
             .Include(b => b.BuildComponents)
             .ThenInclude(bc => bc.Component)
+            .Include(b => b.Comments)
+            .ThenInclude(c => c.UserProfile)
+            .Include(b => b.Comments)
+            .ThenInclude(c => c.Replies)
+            .ThenInclude(r => r.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
             .Select(b => new BuildForBuildDetailsDTO()
             {
                 Id = b.Id,
@@ -81,7 +87,38 @@ public class BuildController : ControllerBase
                     LastName = b.UserProfile.LastName,
                     UserName = b.UserProfile.IdentityUser.UserName,
                     ImageLocation = b.UserProfile.ImageLocation
-                }
+                },
+                Comments = b.Comments.Select(c => new CommentForBuildDTO()
+                {
+                    Id = c.Id,
+                    UserProfileId = c.UserProfileId,
+                    BuildId = c.BuildId,
+                    Content = c.Content,
+                    DateCreated = c.DateCreated,
+                    UserProfile = new UserProfileForCommentDTO()
+                    {
+                        Id = c.UserProfile.Id,
+                        FirstName = c.UserProfile.FirstName,
+                        LastName = c.UserProfile.LastName,
+                        UserName = c.UserProfile.IdentityUser.UserName,
+                        ImageLocation = c.UserProfile.ImageLocation
+                    },
+                    Replies = c.Replies.Select(r => new ReplyForCommentDTO()
+                    {
+                        Id = r.Id,
+                        CommentId = r.CommentId,
+                        UserProfileId = r.UserProfileId,
+                        Content = r.Content,
+                        UserProfile = new UserProfileForReplyDTO()
+                        {
+                            Id = r.UserProfile.Id,
+                            FirstName = r.UserProfile.FirstName,
+                            LastName = r.UserProfile.LastName,
+                            ImageLocation = r.UserProfile.ImageLocation,
+                            UserName = r.UserProfile.IdentityUser.UserName
+                        }
+                    }).ToList()
+                }).ToList()
             })
             .SingleOrDefault(b => b.Id == id);
         
