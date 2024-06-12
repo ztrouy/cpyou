@@ -2,22 +2,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CPYou.Models;
 
-public class Build
+public class Reply
 {
     public int Id { get; set; }
+    
+    [Required]
+    public int CommentId { get; set; }
+
     [Required]
     public int UserProfileId { get; set; }
-    [Required]
-    public string Name { get; set; }
+
     [Required]
     public string Content { get; set; }
+
     [Required]
     public DateTime DateCreated { get; set; }
 
     // Navigation Properties
+    public Comment Comment { get; set; }
+
     public UserProfile UserProfile { get; set; }
-
-    public List<BuildComponent> BuildComponents { get; set; }
-
-    public List<Comment> Comments { get; set; }
 }

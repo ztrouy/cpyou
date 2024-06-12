@@ -38,4 +38,9 @@ public class UserProfileDTO
     // Navigation Properties
     public IdentityUser IdentityUser { get; set; }
 
+    public List<BuildDTO> Builds { get; set; }
+
+    public List<CommentDTO> Comments { get; set; }
+
+    public List<ReplyDTO> Replies { get; set; }
 }

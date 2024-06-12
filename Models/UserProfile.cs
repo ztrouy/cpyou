@@ -36,4 +36,8 @@ public class UserProfile
     public IdentityUser IdentityUser { get; set; }
 
     public List<Build> Builds { get; set; }
+
+    public List<Comment> Comments { get; set; }
+
+    public List<Reply> Replies { get; set; }
 }

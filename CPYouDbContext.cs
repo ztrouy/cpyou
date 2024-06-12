@@ -12,6 +12,8 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Build> Builds { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<BuildComponent> BuildComponents { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<Reply> Replies { get; set; }
 
 
     public CPYouDbContext(DbContextOptions<CPYouDbContext> context, IConfiguration config) : base(context)
@@ -32,6 +34,7 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
             .HasOne(bc => bc.Component)
             .WithMany(b => b.BuildComponents)
             .HasForeignKey(bc => bc.ComponentId);
+
         
         modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
         {
@@ -229,7 +232,8 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
                 Name = "Mini ITX Build",
                 Content = "Compact build for small spaces",
                 DateCreated = new DateTime(2023, 6, 1)
-            }
+            },
+
         });
 
         // Seed data for BuildComponents
@@ -287,6 +291,36 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
             new BuildComponent { BuildId = 6, ComponentId = 9, Quantity = 1 },
             new BuildComponent { BuildId = 6, ComponentId = 11, Quantity = 2 },
             new BuildComponent { BuildId = 6, ComponentId = 13, Quantity = 1 },
+        });
+
+        // Seed data for Comments
+        modelBuilder.Entity<Comment>().HasData(new Comment[]
+        {
+            new Comment { Id = 1, UserProfileId = 1, BuildId = 5, Content = "VR ready and under budget, nice!", DateCreated = new DateTime(2023, 5, 25) },
+            new Comment { Id = 2, UserProfileId = 2, BuildId = 1, Content = "This build looks amazing! How does it handle AAA games?", DateCreated = new DateTime(2023, 1, 5) },
+            new Comment { Id = 3, UserProfileId = 2, BuildId = 1, Content = "Great build!", DateCreated = DateTime.Now },
+            new Comment { Id = 4, UserProfileId = 2, BuildId = 6, Content = "How does it perform?", DateCreated = DateTime.Now },
+            new Comment { Id = 5, UserProfileId = 3, BuildId = 1, Content = "I have a similar setup. Runs like a dream!", DateCreated = new DateTime(2023, 1, 6) },
+            new Comment { Id = 6, UserProfileId = 3, BuildId = 2, Content = "Very efficient setup.", DateCreated = DateTime.Now },
+            new Comment { Id = 7, UserProfileId = 4, BuildId = 2, Content = "Great choice for content creation. The Ryzen 9 is a beast.", DateCreated = new DateTime(2023, 2, 10) },
+            new Comment { Id = 8, UserProfileId = 4, BuildId = 3, Content = "Looks good for the price.", DateCreated = DateTime.Now },
+            new Comment { Id = 9, UserProfileId = 5, BuildId = 3, Content = "Perfect budget build. Thanks for sharing!", DateCreated = new DateTime(2023, 3, 15) },
+            new Comment { Id = 10, UserProfileId = 5, BuildId = 4, Content = "I'm thinking of building something similar.", DateCreated = DateTime.Now },
+            new Comment { Id = 11, UserProfileId = 6, BuildId = 4, Content = "Thinking of building something similar for streaming. Any tips?", DateCreated = new DateTime(2023, 4, 20) },
+            new Comment { Id = 12, UserProfileId = 6, BuildId = 5, Content = "Any issues with streaming?", DateCreated = DateTime.Now }
+        });
+
+        // Seed data for Replies
+        modelBuilder.Entity<Reply>().HasData(new Reply[]
+        {
+            new Reply { Id = 1, CommentId = 1, UserProfileId = 5, Content = "Thanks! It's been great so far.", DateCreated = DateTime.Now },
+            new Reply { Id = 2, CommentId = 1, UserProfileId = 1, Content = "What VR hardware are you using?", DateCreated = DateTime.Now },
+            new Reply { Id = 3, CommentId = 2, UserProfileId = 2, Content = "Yes, it runs smoothly.", DateCreated = DateTime.Now },
+            new Reply { Id = 4, CommentId = 2, UserProfileId = 5, Content = "What software do you use?", DateCreated = DateTime.Now },
+            new Reply { Id = 5, CommentId = 3, UserProfileId = 6, Content = "I'm considering this build too.", DateCreated = DateTime.Now },
+            new Reply { Id = 6, CommentId = 3, UserProfileId = 2, Content = "It's quite good for the budget.", DateCreated = DateTime.Now },
+            new Reply { Id = 7, CommentId = 4, UserProfileId = 3, Content = "You should go for it!", DateCreated = DateTime.Now },
+            new Reply { Id = 8, CommentId = 4, UserProfileId = 6, Content = "What components are you considering?", DateCreated = DateTime.Now }
         });
     }
 }

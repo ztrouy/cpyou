@@ -1,23 +1,25 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CPYou.Models;
+namespace CPYou.Models.DTOs;
 
-public class Build
+public class CommentDTO
 {
     public int Id { get; set; }
+
     [Required]
     public int UserProfileId { get; set; }
+
     [Required]
-    public string Name { get; set; }
+    public int BuildId { get; set; }
+
     [Required]
     public string Content { get; set; }
+
     [Required]
     public DateTime DateCreated { get; set; }
 
     // Navigation Properties
-    public UserProfile UserProfile { get; set; }
+    public UserProfileDTO UserProfile { get; set; }
 
-    public List<BuildComponent> BuildComponents { get; set; }
-
-    public List<Comment> Comments { get; set; }
+    public BuildDTO Build { get; set; }
 }
