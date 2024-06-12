@@ -29,4 +29,6 @@ public class BuildForBuildDetailsDTO
     public UserProfileForBuildDTO UserProfile { get; set; }
 
     public List<ComponentForBuildDTO> Components { get; set; }
+
+    public List<CommentForBuildDTO> Comments { get; set; }
 }
