@@ -19,7 +19,7 @@ public class CommentForBuildDTO
     public DateTime DateCreated { get; set; }
 
     // Calculated Properties
-    public string FormattedDateCreated => DateCreated.ToString("MMMM dd, yyyy");
+    public string FormattedDateCreated => DateCreated.ToString("MMM dd, yyyy");
 
     // Navigation Properties
     public UserProfileForCommentDTO UserProfile { get; set; }
