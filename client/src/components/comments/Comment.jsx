@@ -1,9 +1,12 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
+import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, Typography } from "@mui/material"
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useContext, useState } from "react"
 import { AuthContext } from "../../App";
 import AddReaction from "@mui/icons-material/AddReaction";
 import CommentIcon from "@mui/icons-material/Comment";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import EditRemoveMenu from "../menus/EditRemoveMenu.jsx";
 
 export const Comment = ({ comment }) => {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -29,9 +32,7 @@ export const Comment = ({ comment }) => {
                     </Box>
                     {comment.userProfileId == loggedInUser.id && (
                         <Box sx={{display: {xs: "none", sm: "flex"}, flexGrow: 1, justifyContent: "end", alignItems: "start"}}>
-                            <IconButton sx={{p: 0}}>
-                                <MoreVertIcon fontSize="small"/>
-                            </IconButton>
+                            <EditRemoveMenu />
                         </Box>
                     )}
                 </Box>
@@ -40,21 +41,17 @@ export const Comment = ({ comment }) => {
                     <IconButton><CommentIcon fontSize="small"/></IconButton>
                     {comment.userProfileId == loggedInUser.id && (
                         <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                            <IconButton sx={{pr: 0}}>
-                                <MoreVertIcon fontSize="small"/>
-                            </IconButton>
+                            <EditRemoveMenu />
                         </Box>
                     )}
                 </CardActions>
                 {comment.replies.length > 0 && (
                 <>
                     <CardActions sx={{pb: 0, mb: 0}}>
-                        <Button onClick={() => toggleExpand()}>
-                            {isExpanded ? (
-                                `Hide Replies`
-                            ) : (
-                                `Show ${comment.replies.length} ${comment.replies.length > 1 ? "Replies" : "Reply"}`
-                            )}
+                        <Button onClick={() => toggleExpand()}
+                            startIcon={isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        >
+                            {`${comment.replies.length} ${comment.replies.length > 1 ? "Replies" : "Reply"}`}
                         </Button>
                     </CardActions>
                     <Collapse in={isExpanded} timeout={"auto"}>
@@ -72,9 +69,7 @@ export const Comment = ({ comment }) => {
                                                 <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}} noWrap>{r.formattedDateCreated}</Typography>
                                                 {r.userProfileId == loggedInUser.id && (
                                                     <Box display={{xs: "none", sm: "inline-block"}}>
-                                                        <IconButton sx={{p: 0}}>
-                                                            <MoreVertIcon fontSize="small"/>
-                                                        </IconButton>
+                                                        <EditRemoveMenu />
                                                     </Box>
                                                 )}
                                             </Box>
@@ -84,9 +79,7 @@ export const Comment = ({ comment }) => {
                                                 <IconButton><CommentIcon fontSize="small"/></IconButton>
                                                 {r.userProfileId == loggedInUser.id && (
                                                     <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                                        <IconButton sx={{pr: 0}}>
-                                                            <MoreVertIcon fontSize="small"/>
-                                                        </IconButton>
+                                                        <EditRemoveMenu />
                                                     </Box>
                                                 )}
                                             </Box>
