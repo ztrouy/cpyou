@@ -8,7 +8,6 @@ export const EditRemoveMenu = () => {
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget)
-        console.log("Clicked!")
     }
 
     const handleClose = () => {
@@ -16,12 +15,10 @@ export const EditRemoveMenu = () => {
     }
 
     const handleEdit = () => {
-        console.log("Edit!")
         handleClose()
     }
     
     const handleDelete = () => {
-        console.log("Delete!")
         handleClose()
     }
     
