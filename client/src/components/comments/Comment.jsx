@@ -1,5 +1,4 @@
 import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, Typography } from "@mui/material"
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useContext, useState } from "react"
 import { AuthContext } from "../../App";
 import AddReaction from "@mui/icons-material/AddReaction";
