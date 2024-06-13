@@ -315,11 +315,11 @@ public class CPYouDbContext : IdentityDbContext<IdentityUser>
         {
             new Reply { Id = 1, CommentId = 1, UserProfileId = 5, Content = "Thanks! It's been great so far.", DateCreated = DateTime.Now },
             new Reply { Id = 2, CommentId = 1, UserProfileId = 1, Content = "What VR hardware are you using?", DateCreated = DateTime.Now },
-            new Reply { Id = 3, CommentId = 2, UserProfileId = 2, Content = "Yes, it runs smoothly.", DateCreated = DateTime.Now },
+            new Reply { Id = 3, CommentId = 2, UserProfileId = 1, Content = "Yes, it runs smoothly.", DateCreated = DateTime.Now },
             new Reply { Id = 4, CommentId = 2, UserProfileId = 5, Content = "What software do you use?", DateCreated = DateTime.Now },
             new Reply { Id = 5, CommentId = 3, UserProfileId = 6, Content = "I'm considering this build too.", DateCreated = DateTime.Now },
-            new Reply { Id = 6, CommentId = 3, UserProfileId = 2, Content = "It's quite good for the budget.", DateCreated = DateTime.Now },
-            new Reply { Id = 7, CommentId = 4, UserProfileId = 3, Content = "You should go for it!", DateCreated = DateTime.Now },
+            new Reply { Id = 6, CommentId = 3, UserProfileId = 1, Content = "It's quite good for the budget.", DateCreated = DateTime.Now },
+            new Reply { Id = 7, CommentId = 4, UserProfileId = 6, Content = "You should go for it!", DateCreated = DateTime.Now },
             new Reply { Id = 8, CommentId = 4, UserProfileId = 6, Content = "What components are you considering?", DateCreated = DateTime.Now }
         });
     }
