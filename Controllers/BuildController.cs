@@ -109,6 +109,7 @@ public class BuildController : ControllerBase
                         CommentId = r.CommentId,
                         UserProfileId = r.UserProfileId,
                         Content = r.Content,
+                        DateCreated = r.DateCreated,
                         UserProfile = new UserProfileForReplyDTO()
                         {
                             Id = r.UserProfile.Id,
@@ -117,8 +118,8 @@ public class BuildController : ControllerBase
                             ImageLocation = r.UserProfile.ImageLocation,
                             UserName = r.UserProfile.IdentityUser.UserName
                         }
-                    }).ToList()
-                }).ToList()
+                    }).OrderBy(r => r.DateCreated).ToList()
+                }).OrderByDescending(c => c.DateCreated).ToList()
             })
             .SingleOrDefault(b => b.Id == id);
         
