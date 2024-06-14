@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { getBuilds } from "../../managers/buildManager.js"
 import { useNavigate } from "react-router-dom"
 
-export const BuildsList = ({ loggedInUser }) => {
+export const BuildsList = () => {
     const [builds, setBuilds] = useState(null)
     
     useEffect(() => {
@@ -36,6 +36,7 @@ export const BuildsList = ({ loggedInUser }) => {
                             </Box>
                             <Typography>{b.userProfile.userName}</Typography>
                             <Typography sx={{fontStyle: "italic"}}>{`${b.componentsQuantity} components`}</Typography>
+                            <Typography sx={{fontStyle: "italic"}}>{`${b.commentsQuantity} ${b.commentsQuantity == 1 ? "comment" : "comments"}`}</Typography>
                         </Paper>
                     ))}
                 </Box>
