@@ -1,8 +1,9 @@
-import { Box, Button, Chip, CircularProgress, Container, Paper, Typography } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Avatar, Box, Button, Chip, CircularProgress, Container, Divider, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { deleteBuild, getSingleBuild } from "../../managers/buildManager.js"
 import DeleteModal from "../modals/DeleteModal.jsx"
+import Comment from "../comments/Comment.jsx"
 
 export const BuildDetails = ({ loggedInUser }) => {
     const [build, setBuild] = useState(null)
@@ -31,8 +32,8 @@ export const BuildDetails = ({ loggedInUser }) => {
     }
 
     return (
-        <Container>
-            <Paper sx={{p: 2, mt: 5}}>
+        <Container sx={{py: 5}}>
+            <Paper elevation={2} sx={{p: 2}}>
                 <Typography variant="h4">{build.name}</Typography>
                 <Box sx={{my: 2}}>
                     <Typography>{build.userProfile.userName}</Typography>
@@ -59,6 +60,12 @@ export const BuildDetails = ({ loggedInUser }) => {
                     </Box>
                 )}
             </Paper>
+            <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
+                {build.comments.length > 0 && <Typography variant="h5" marginTop={1}>Comments</Typography>}
+                {build.comments?.map(c => (
+                    <Comment comment={c} key={`comment-${c.id}`}/>
+                ))}
+            </Box>
             <DeleteModal 
                 isOpen={isModalOpen}
                 toggle={toggleDeleteModal}
