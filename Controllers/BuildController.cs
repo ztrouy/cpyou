@@ -28,6 +28,8 @@ public class BuildController : ControllerBase
             .ThenInclude(up => up.IdentityUser)
             .Include(b => b.BuildComponents)
             .ThenInclude(bc => bc.Component)
+            .Include(b => b.Comments)
+            .ThenInclude(c => c.Replies)
             .OrderByDescending(b => b.DateCreated)
             .Select(b => new BuildForListDTO()
             {
@@ -37,6 +39,7 @@ public class BuildController : ControllerBase
                 DateCreated = b.DateCreated,
                 TotalPrice = b.BuildComponents.Sum(bc => bc.Component.Price * bc.Quantity),
                 ComponentsQuantity = b.BuildComponents.Sum(bc => bc.Quantity),
+                CommentsQuantity = b.Comments.Sum(c => c.Replies.Count + 1),
                 UserProfile = new UserProfileForBuildDTO()
                 {
                     Id = b.UserProfile.Id,
