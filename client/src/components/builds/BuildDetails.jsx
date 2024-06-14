@@ -61,7 +61,7 @@ export const BuildDetails = ({ loggedInUser }) => {
                 )}
             </Paper>
             <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
-                <Typography variant="h5" marginTop={1}>Comments</Typography>
+                {build.comments.length > 0 && <Typography variant="h5" marginTop={1}>Comments</Typography>}
                 {build.comments?.map(c => (
                     <Comment comment={c} key={`comment-${c.id}`}/>
                 ))}
