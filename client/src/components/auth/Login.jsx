@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../managers/authManager";
 import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material"
+import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js";
 
-export default function Login({ setLoggedInUser }) {
+export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [failedLogin, setFailedLogin] = useState(false);
+
+    const { setLoggedInUser } = useAuthorizationProvider()
 
     const handleSubmit = (e) => {
         e.preventDefault();
