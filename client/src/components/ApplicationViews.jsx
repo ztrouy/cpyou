@@ -6,7 +6,7 @@ import BuildsList from "./builds/BuildsList.jsx";
 import BuildDetails from "./builds/BuildDetails.jsx";
 import BuildForm from "./builds/BuildForm.jsx";
 
-export default function ApplicationViews() {
+export const ApplicationViews = () => {
     return (
         <Routes>
             <Route path="/" element={<AuthorizedRoute />}>
@@ -28,3 +28,5 @@ export default function ApplicationViews() {
         </Routes>
     );
 }
+
+export default ApplicationViews
