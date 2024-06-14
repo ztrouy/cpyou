@@ -6,66 +6,25 @@ import BuildsList from "./builds/BuildsList.jsx";
 import BuildDetails from "./builds/BuildDetails.jsx";
 import BuildForm from "./builds/BuildForm.jsx";
 
-export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
-  return (
-    <Routes>
-      <Route path="/">
-        <Route
-          index
-          element={
-            <AuthorizedRoute loggedInUser={loggedInUser}>
-              <>Home Page</>
-            </AuthorizedRoute>
-          }
-        />
-        <Route path="builds">
-          <Route 
-            index
-            element= {
-              <AuthorizedRoute loggedInUser={loggedInUser}>
-                <BuildsList loggedInUser={loggedInUser}/>
-              </AuthorizedRoute>
-            }
-          />
-          <Route path=":buildId">
-            <Route 
-              index
-              element={
-                <AuthorizedRoute loggedInUser={loggedInUser}>
-                  <BuildDetails loggedInUser={loggedInUser}/>
-                </AuthorizedRoute>
-              }
-            />
-            <Route 
-              path="edit"
-              element={
-                <AuthorizedRoute loggedInUser={loggedInUser}>
-                  <BuildForm loggedInUser={loggedInUser}/>
-                </AuthorizedRoute>
-              }
-            />
-          </Route>
-          <Route path="new">
-              <Route 
-                index
-                element={
-                  <AuthorizedRoute loggedInUser={loggedInUser}>
-                    <BuildForm loggedInUser={loggedInUser}/>
-                  </AuthorizedRoute>
-                }
-              />
-          </Route>
-        </Route>
-        <Route
-          path="login"
-          element={<Login setLoggedInUser={setLoggedInUser} />}
-        />
-        <Route
-          path="register"
-          element={<Register setLoggedInUser={setLoggedInUser} />}
-        />
-      </Route>
-      <Route path="*" element={<p>Whoops, nothing here...</p>} />
-    </Routes>
-  );
+export default function ApplicationViews() {
+    return (
+        <Routes>
+            <Route path="/" element={<AuthorizedRoute />}>
+                <Route index element={<>Home Page</>}/>
+                <Route path="builds">
+                <Route index element={<BuildsList/>}/>
+                <Route path=":buildId">
+                    <Route index element={<BuildDetails/>}/>
+                    <Route path="edit" element={<BuildForm/>}/>
+                </Route>
+                <Route path="new">
+                    <Route index element={<BuildForm/>}/>
+                </Route>
+                </Route>
+            </Route>
+            <Route path="login" element={<Login/>}/>
+            <Route path="register" element={<Register/>}/>
+            <Route path="*" element={<p>Whoops, nothing here...</p>}/>
+        </Routes>
+    );
 }
