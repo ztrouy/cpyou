@@ -3,13 +3,15 @@ import { useEffect, useState } from "react"
 import { getComponents } from "../../managers/componentManager.js"
 import { useNavigate, useParams } from "react-router-dom"
 import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
+import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
 
-export const BuildForm = ({ loggedInUser }) => {
+export const BuildForm = () => {
     const [name, setName] = useState("")
     const [content, setContent] = useState("")
     const [components, setComponents] = useState([])
     const [chosenComponents, setChosenComponents] = useState([])
     const [importedBuild, setImportedBuild] = useState(null)
+    const { loggedInUser } = useAuthorizationProvider()
 
     const { buildId } = useParams()
 

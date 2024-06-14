@@ -2,8 +2,9 @@ import { useState } from "react";
 import { register } from "../../managers/authManager";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js";
 
-export default function Register({ setLoggedInUser }) {
+export default function Register() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [userName, setUserName] = useState("");
@@ -14,6 +15,8 @@ export default function Register({ setLoggedInUser }) {
     const [errors, setErrors] = useState([]);
 
     const [passwordMismatch, setPasswordMismatch] = useState();
+
+    const {setLoggedInUser} = useAuthorizationProvider()
 
     const navigate = useNavigate();
 

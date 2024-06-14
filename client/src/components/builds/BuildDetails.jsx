@@ -1,13 +1,15 @@
-import { Accordion, AccordionDetails, AccordionSummary, Avatar, Box, Button, Chip, CircularProgress, Container, Divider, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from "@mui/material"
+import { Box, Button, Chip, CircularProgress, Container, Divider, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { deleteBuild, getSingleBuild } from "../../managers/buildManager.js"
 import DeleteModal from "../modals/DeleteModal.jsx"
 import Comment from "../comments/Comment.jsx"
+import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
 
-export const BuildDetails = ({ loggedInUser }) => {
+export const BuildDetails = () => {
     const [build, setBuild] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const { loggedInUser } = useAuthorizationProvider()
 
     const { buildId } = useParams()
 
@@ -61,7 +63,7 @@ export const BuildDetails = ({ loggedInUser }) => {
                 )}
             </Paper>
             <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
-                <Typography variant="h5" marginTop={1}>Comments</Typography>
+                {build.comments.length > 0 && <Typography variant="h5" marginTop={1}>Comments</Typography>}
                 {build.comments?.map(c => (
                     <Comment comment={c} key={`comment-${c.id}`}/>
                 ))}

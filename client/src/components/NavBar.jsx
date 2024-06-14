@@ -1,7 +1,10 @@
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, Button, Toolbar } from "@mui/material"
 import { logout } from "../managers/authManager.js"
+import useAuthorizationProvider from "../shared/hooks/authorization/useAuthorizationProvider.js"
 
-export const NavBar = ({ loggedInUser, setLoggedInUser}) => {
+export const NavBar = () => {
+    const { loggedInUser, setLoggedInUser } = useAuthorizationProvider()
+    
     const handleLogout = (e) => {
         e.preventDefault()
         logout().then(() => setLoggedInUser(null))

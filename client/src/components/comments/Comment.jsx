@@ -1,15 +1,15 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, Typography } from "@mui/material"
-import { useContext, useState } from "react"
-import { AuthContext } from "../../App";
+import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
+import { useState } from "react"
 import AddReaction from "@mui/icons-material/AddReaction";
 import CommentIcon from "@mui/icons-material/Comment";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import EditRemoveMenu from "../menus/EditRemoveMenu.jsx";
+import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js";
 
 export const Comment = ({ comment }) => {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [loggedInUser] = useContext(AuthContext)
+    const { loggedInUser } = useAuthorizationProvider()
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded)
