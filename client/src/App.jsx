@@ -1,43 +1,31 @@
-import { createContext, useEffect, useState } from "react";
-import "./App.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect } from "react";
 import { tryGetLoggedInUser } from "./managers/authManager";
 import NavBar from "./components/NavBar";
 import ApplicationViews from "./components/ApplicationViews";
-import { CircularProgress, CssBaseline, ThemeProvider } from "@mui/material";
+import { CircularProgress, CssBaseline } from "@mui/material";
+import useAuthorizationProvider from "./shared/hooks/authorization/useAuthorizationProvider.js";
 
-export const AuthContext = createContext()
+const App = () => {
+    const { loggedInUser, setLoggedInUser } = useAuthorizationProvider()
 
-function App() {
-  const [loggedInUser, setLoggedInUser] = useState();
+    useEffect(() => {
+        // user will be null if not authenticated
+        tryGetLoggedInUser().then((user) => {
+            setLoggedInUser(user);
+        });
+    }, []);
 
-  useEffect(() => {
-    // user will be null if not authenticated
-    tryGetLoggedInUser().then((user) => {
-      setLoggedInUser(user);
-    });
-  }, []);
+    // wait to get a definite logged-in state before rendering
+    if (loggedInUser === undefined) {
+        return <CircularProgress />;
+    }
 
-  // wait to get a definite logged-in state before rendering
-  if (loggedInUser === undefined) {
-    return <CircularProgress />;
-  }
-
-  return (
-    <>
-    {/* <ThemeProvider> */}
-      <CssBaseline>
-        <AuthContext.Provider value={[loggedInUser, setLoggedInUser]}>
-          <NavBar loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} />
-          <ApplicationViews
-            loggedInUser={loggedInUser}
-            setLoggedInUser={setLoggedInUser}
-          />
-        </AuthContext.Provider>
-      </CssBaseline>
-    {/* </ThemeProvider> */}
-    </>
-  );
+    return (
+        <CssBaseline>
+            <NavBar/>
+            <ApplicationViews/>
+        </CssBaseline>
+    );
 }
 
 export default App;
