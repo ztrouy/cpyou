@@ -19,6 +19,8 @@ public class BuildForListDTO
 
     public int ComponentsQuantity { get; set; }
 
+    public int CommentsQuantity { get; set; }
+
     // Calculated Properties
     public string FormattedDateCreated => DateCreated.ToString("MMMM dd, yyyy");
 
