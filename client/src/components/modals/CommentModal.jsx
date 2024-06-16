@@ -12,11 +12,12 @@ export const CommentModal = ({ isOpen, toggle, submit, typeName}) => {
     return (
         <Dialog open={isOpen} onClose={toggle} fullWidth>
             <DialogTitle>Create {typeName}</DialogTitle>
-            <Box sx={{p: 2}}>
+            <Box sx={{px: 2}}>
                 <TextField 
                     type="text"
                     placeholder="Write comment here..."
                     autoFocus
+                    multiline
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     fullWidth
