@@ -6,93 +6,117 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import EditRemoveMenu from "../menus/EditRemoveMenu.jsx";
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js";
+import CommentModal from "../modals/CommentModal.jsx";
+import { createReply } from "../../managers/replyManager.js";
 
-export const Comment = ({ comment }) => {
+export const Comment = ({ comment, refreshPage }) => {
     const [isExpanded, setIsExpanded] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     const { loggedInUser } = useAuthorizationProvider()
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded)
     }
 
+    const toggleModal = () => {
+        setIsOpen(!isOpen)
+    }
+
+    const handleSubmitComment = (input) => {
+        const reply = {
+            commentId: comment.id,
+            userProfileId: loggedInUser.id,
+            content: input
+        }
+
+        createReply(reply).then(() => {
+            toggleModal()
+            refreshPage()
+            setIsExpanded(true)
+        })
+    }
+
     return (
-        <Card sx={{pt: 1}}>
-            <CardContent>
-                <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
-                    <Avatar 
-                        src={comment.userProfile.imageLocation}
-                    />
-                    <Box sx={{flexGrow: 1, pr: 1}}>
-                        <Box sx={{display: "flex", flexDirection: "row", gap: 1, flexGrow: 1}}>
-                            <Typography fontWeight={"bold"}>{comment.userProfile.userName}</Typography>
-                            <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}}>{comment.formattedDateCreated}</Typography>
+        <>
+            <Card sx={{pt: 1}}>
+                <CardContent>
+                    <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
+                        <Avatar 
+                            src={comment.userProfile.imageLocation}
+                        />
+                        <Box sx={{flexGrow: 1, pr: 1}}>
+                            <Box sx={{display: "flex", flexDirection: "row", gap: 1, flexGrow: 1}}>
+                                <Typography fontWeight={"bold"}>{comment.userProfile.userName}</Typography>
+                                <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}}>{comment.formattedDateCreated}</Typography>
+                            </Box>
+                            <Typography>{comment.content}</Typography>
                         </Box>
-                        <Typography>{comment.content}</Typography>
+                        {comment.userProfileId == loggedInUser.id && (
+                            <Box sx={{display: {xs: "none", sm: "flex"}, flexGrow: 1, justifyContent: "end", alignItems: "start"}}>
+                                <EditRemoveMenu />
+                            </Box>
+                        )}
                     </Box>
-                    {comment.userProfileId == loggedInUser.id && (
-                        <Box sx={{display: {xs: "none", sm: "flex"}, flexGrow: 1, justifyContent: "end", alignItems: "start"}}>
-                            <EditRemoveMenu />
-                        </Box>
-                    )}
-                </Box>
-                <CardActions sx={{pb: 0, mb: 0}}>
-                    <IconButton><AddReaction fontSize="small"/></IconButton>
-                    <IconButton><CommentIcon fontSize="small"/></IconButton>
-                    {comment.userProfileId == loggedInUser.id && (
-                        <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                            <EditRemoveMenu />
-                        </Box>
-                    )}
-                </CardActions>
-                {comment.replies.length > 0 && (
-                <>
                     <CardActions sx={{pb: 0, mb: 0}}>
-                        <Button onClick={() => toggleExpand()}
-                            startIcon={isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                        >
-                            {`${comment.replies.length} ${comment.replies.length > 1 ? "Replies" : "Reply"}`}
-                        </Button>
+                        <IconButton><AddReaction fontSize="small"/></IconButton>
+                        <IconButton onClick={() => toggleModal()}><CommentIcon fontSize="small"/></IconButton>
+                        {comment.userProfileId == loggedInUser.id && (
+                            <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
+                                <EditRemoveMenu />
+                            </Box>
+                        )}
                     </CardActions>
-                    <Collapse in={isExpanded} timeout={"auto"}>
-                        <List sx={{width: 1, pb: 0, px: 0}}>
-                            {comment.replies.map(r => (
-                                <Box key={`reply-${r.id}`}>
-                                    <Divider variant="inset" sx={{pt: 1}}/>
-                                    <ListItem alignItems="flex-start" sx={{pb: 0, pr: 0, pt: 2}}>
-                                        <ListItemAvatar>
-                                            <Avatar src={r.userProfile.imageLocation}/>
-                                        </ListItemAvatar>
-                                        <ListItemText>
-                                            <Box sx={{display: "flex", flexDirection: "row", gap: 1, flexGrow: 1, pr: 1}}>
-                                                <Typography sx={{fontWeight: "bold"}} noWrap>{r.userProfile.userName}</Typography>
-                                                <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}} noWrap>{r.formattedDateCreated}</Typography>
-                                                {r.userProfileId == loggedInUser.id && (
-                                                    <Box display={{xs: "none", sm: "inline-block"}}>
-                                                        <EditRemoveMenu />
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                            <Typography>{r.content}</Typography>
-                                            <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, gap: 2}}>
-                                                <IconButton><AddReaction fontSize="small"/></IconButton>
-                                                <IconButton><CommentIcon fontSize="small"/></IconButton>
-                                                {r.userProfileId == loggedInUser.id && (
-                                                    <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                                        <EditRemoveMenu />
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        </ListItemText>
-                                    </ListItem>
-                                </Box>
-                            ))}
-                        </List>
-                    </Collapse>
-                </>
-                )}
-                
-            </CardContent>
-        </Card>
+                    {comment.replies.length > 0 && (
+                    <>
+                        <CardActions sx={{pb: 0, mb: 0}}>
+                            <Button onClick={() => toggleExpand()}
+                                startIcon={isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            >
+                                {`${comment.replies.length} ${comment.replies.length > 1 ? "Replies" : "Reply"}`}
+                            </Button>
+                        </CardActions>
+                        <Collapse in={isExpanded} timeout={"auto"}>
+                            <List sx={{width: 1, pb: 0, px: 0}}>
+                                {comment.replies.map(r => (
+                                    <Box key={`reply-${r.id}`}>
+                                        <Divider variant="inset" sx={{pt: 1}}/>
+                                        <ListItem alignItems="flex-start" sx={{pb: 0, pr: 0, pt: 2}}>
+                                            <ListItemAvatar>
+                                                <Avatar src={r.userProfile.imageLocation}/>
+                                            </ListItemAvatar>
+                                            <ListItemText>
+                                                <Box sx={{display: "flex", flexDirection: "row", gap: 1, flexGrow: 1, pr: 1}}>
+                                                    <Typography sx={{fontWeight: "bold"}} noWrap>{r.userProfile.userName}</Typography>
+                                                    <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}} noWrap>{r.formattedDateCreated}</Typography>
+                                                    {r.userProfileId == loggedInUser.id && (
+                                                        <Box display={{xs: "none", sm: "inline-block"}}>
+                                                            <EditRemoveMenu />
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                                <Typography>{r.content}</Typography>
+                                                <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, gap: 2}}>
+                                                    <IconButton><AddReaction fontSize="small"/></IconButton>
+                                                    <IconButton onClick={() => toggleModal()}><CommentIcon fontSize="small"/></IconButton>
+                                                    {r.userProfileId == loggedInUser.id && (
+                                                        <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
+                                                            <EditRemoveMenu />
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            </ListItemText>
+                                        </ListItem>
+                                    </Box>
+                                ))}
+                            </List>
+                        </Collapse>
+                    </>
+                    )}
+                    
+                </CardContent>
+            </Card>
+            <CommentModal isOpen={isOpen} toggle={toggleModal} submit={handleSubmitComment} typeName={"Reply"}/>
+        </>
     )
 }
 
