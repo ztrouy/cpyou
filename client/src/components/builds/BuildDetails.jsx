@@ -45,11 +45,16 @@ export const BuildDetails = () => {
             buildId: buildId,
             userProfileId: loggedInUser.id,
             content: content
-        }
-
-        createComment(comment).then(() => {
-            toggleCommentModal()
-            refreshPage()
+            }
+            
+            return createComment(comment).then(res => {
+                if (res.ok) {
+                    refreshPage()
+                    toggleCommentModal()
+                    return true
+                } else {
+                    return false
+                }
         })
     }
     

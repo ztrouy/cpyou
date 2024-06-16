@@ -1,14 +1,23 @@
 import { Box, Button, Dialog, DialogActions, DialogTitle, TextField } from "@mui/material"
 import { useState } from "react"
 
-export const CommentModal = ({ isOpen, toggle, submit, typeName}) => {
+export const CommentModal = ({ isOpen, toggle, submit, typeName }) => {
     const [input, setInput] = useState("")
+    const [failedSubmit, setFailedSubmit] = useState(false)
     
     const handleSubmit = () => {
-        submit(input)
-        setInput("")
+        submit(input).then(success => {
+            if (success) {
+                setFailedSubmit(false)
+                setTimeout(() => {
+                    setInput("")
+                }, 200);
+            } else {
+                setFailedSubmit(true)
+            }
+        })
     }
-
+        
     return (
         <Dialog open={isOpen} onClose={toggle} fullWidth>
             <DialogTitle>Create {typeName}</DialogTitle>
@@ -18,9 +27,11 @@ export const CommentModal = ({ isOpen, toggle, submit, typeName}) => {
                     placeholder="Write comment here..."
                     autoFocus
                     multiline
+                    fullWidth
                     value={input}
                     onChange={e => setInput(e.target.value)}
-                    fullWidth
+                    error={failedSubmit}
+                    helperText={failedSubmit ? "Something went wrong, please try again" : ""}
                 />
 
             </Box>

@@ -23,16 +23,22 @@ export const Comment = ({ comment, refreshPage }) => {
     }
 
     const handleSubmitComment = (input) => {
+        
         const reply = {
             commentId: comment.id,
             userProfileId: loggedInUser.id,
             content: input
-        }
-
-        createReply(reply).then(() => {
-            toggleModal()
-            refreshPage()
-            setIsExpanded(true)
+            }
+            
+        return createReply(reply).then(res => {
+            if (res.ok) {
+                refreshPage()
+                toggleModal()
+                setIsExpanded(true)
+                return true
+            } else {
+                return false
+            }
         })
     }
 
