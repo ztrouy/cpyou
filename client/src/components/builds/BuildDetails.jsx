@@ -5,10 +5,13 @@ import { deleteBuild, getSingleBuild } from "../../managers/buildManager.js"
 import DeleteModal from "../modals/DeleteModal.jsx"
 import Comment from "../comments/Comment.jsx"
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
+import CommentModal from "../modals/CommentModal.jsx"
+import { createComment } from "../../managers/commentManager.js"
 
 export const BuildDetails = () => {
     const [build, setBuild] = useState(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false)
     const { loggedInUser } = useAuthorizationProvider()
 
     const { buildId } = useParams()
@@ -19,13 +22,34 @@ export const BuildDetails = () => {
         getSingleBuild(buildId).then(setBuild)
     }, [buildId])
 
+    const refreshPage = () => {
+        getSingleBuild(buildId).then(setBuild)
+    }
+    
     const toggleDeleteModal = () => {
-        setIsModalOpen(!isModalOpen)
+        setIsDeleteModalOpen(!isDeleteModalOpen)
     }
 
     const handleDelete = () => {
         deleteBuild(buildId).then(() => {
             navigate("/builds")
+        })
+    }
+
+    const toggleCommentModal = () => {
+        setIsCommentModalOpen(!isCommentModalOpen)
+    }
+
+    const handleSubmitComment = (content) => {
+        const comment = {
+            buildId: buildId,
+            userProfileId: loggedInUser.id,
+            content: content
+        }
+
+        createComment(comment).then(() => {
+            toggleCommentModal()
+            refreshPage()
         })
     }
     
@@ -63,16 +87,30 @@ export const BuildDetails = () => {
                 )}
             </Paper>
             <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
-                {build.comments.length > 0 && <Typography variant="h5" marginTop={1}>Comments</Typography>}
+                <Box sx={{display: "flex", flexDirection: "row", alignContent: "center", gap: 1}}>
+                    <Typography variant="h5" marginY={1}>Comments</Typography>
+                    <Box sx={{alignContent: "center", pt: 0.5}}>
+                        <Button onClick={() => toggleCommentModal()}>Comment</Button>
+                    </Box>
+                </Box>
                 {build.comments?.map(c => (
-                    <Comment comment={c} key={`comment-${c.id}`}/>
-                ))}
+                    <Comment comment={c} refreshPage={refreshPage} key={`comment-${c.id}`}/>
+                    ))}
+                {build.comments?.length == 0 && (
+                    <Typography textAlign={"center"}>There are no comments</Typography>
+                )}
             </Box>
             <DeleteModal 
-                isOpen={isModalOpen}
+                isOpen={isDeleteModalOpen}
                 toggle={toggleDeleteModal}
                 confirmDelete={handleDelete}
                 typeName={"Build"}
+            />
+            <CommentModal 
+                isOpen={isCommentModalOpen}
+                toggle={toggleCommentModal}
+                submit={handleSubmitComment}
+                typeName={"Comment"}
             />
         </Container>
     )
