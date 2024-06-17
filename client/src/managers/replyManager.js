@@ -9,3 +9,13 @@ export const createReply = (reply) => {
 
     return fetch(_apiUrl, postOptions)
 }
+
+export const editReply = (reply) => {
+    const putOptions = {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(reply)
+    }
+
+    return fetch(`${_apiUrl}/${reply.id}`, putOptions)
+}
