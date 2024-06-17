@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AddReaction from "@mui/icons-material/AddReaction";
 import CommentIcon from "@mui/icons-material/Comment";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -12,8 +12,10 @@ import { createReply } from "../../managers/replyManager.js";
 export const Comment = ({ comment, refreshPage }) => {
     const [isExpanded, setIsExpanded] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+    const [objectToEdit, setObjectToEdit] = useState(null)
+    const [modalTypeName, setModalTypeName] = useState("")
     const { loggedInUser } = useAuthorizationProvider()
-
+    
     const toggleExpand = () => {
         setIsExpanded(!isExpanded)
     }
@@ -22,7 +24,7 @@ export const Comment = ({ comment, refreshPage }) => {
         setIsOpen(!isOpen)
     }
 
-    const handleSubmitComment = (input) => {
+    const handleSubmitReply = (input) => {
         
         const reply = {
             commentId: comment.id,
@@ -42,6 +44,24 @@ export const Comment = ({ comment, refreshPage }) => {
         })
     }
 
+    const handleCommentButton = () => {
+        setObjectToEdit(null)
+        setModalTypeName("Reply")
+        toggleModal()
+    }
+    
+    const handleEdit = (input) => {
+        setObjectToEdit(input)
+        
+        if (input.hasOwnProperty("buildId")) {
+            setModalTypeName("Comment")
+        } else {
+            setModalTypeName("Reply")
+        }
+        
+        toggleModal()
+    }
+
     return (
         <>
             <Card sx={{pt: 1}}>
@@ -59,16 +79,16 @@ export const Comment = ({ comment, refreshPage }) => {
                         </Box>
                         {comment.userProfileId == loggedInUser.id && (
                             <Box sx={{display: {xs: "none", sm: "flex"}, flexGrow: 1, justifyContent: "end", alignItems: "start"}}>
-                                <EditRemoveMenu />
+                                <EditRemoveMenu editHandler={() => handleEdit(comment)} />
                             </Box>
                         )}
                     </Box>
                     <CardActions sx={{pb: 0, mb: 0}}>
                         <IconButton><AddReaction fontSize="small"/></IconButton>
-                        <IconButton onClick={() => toggleModal()}><CommentIcon fontSize="small"/></IconButton>
+                        <IconButton onClick={() => handleCommentButton()}><CommentIcon fontSize="small"/></IconButton>
                         {comment.userProfileId == loggedInUser.id && (
                             <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                <EditRemoveMenu />
+                                <EditRemoveMenu editHandler={() => handleEdit(comment)} />
                             </Box>
                         )}
                     </CardActions>
@@ -96,17 +116,17 @@ export const Comment = ({ comment, refreshPage }) => {
                                                     <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}} noWrap>{r.formattedDateCreated}</Typography>
                                                     {r.userProfileId == loggedInUser.id && (
                                                         <Box display={{xs: "none", sm: "inline-block"}}>
-                                                            <EditRemoveMenu />
+                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} />
                                                         </Box>
                                                     )}
                                                 </Box>
                                                 <Typography>{r.content}</Typography>
                                                 <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, gap: 2}}>
                                                     <IconButton><AddReaction fontSize="small"/></IconButton>
-                                                    <IconButton onClick={() => toggleModal()}><CommentIcon fontSize="small"/></IconButton>
+                                                    <IconButton onClick={() => handleCommentButton()}><CommentIcon fontSize="small"/></IconButton>
                                                     {r.userProfileId == loggedInUser.id && (
                                                         <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                                            <EditRemoveMenu />
+                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} />
                                                         </Box>
                                                     )}
                                                 </Box>
@@ -121,7 +141,7 @@ export const Comment = ({ comment, refreshPage }) => {
                     
                 </CardContent>
             </Card>
-            <CommentModal isOpen={isOpen} toggle={toggleModal} submit={handleSubmitComment} typeName={"Reply"}/>
+            <CommentModal isOpen={isOpen} toggle={toggleModal} submit={handleSubmitReply} typeName={modalTypeName} importForEdit={objectToEdit} />
         </>
     )
 }
