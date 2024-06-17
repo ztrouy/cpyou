@@ -1,11 +1,31 @@
 import { Box, Button, Dialog, DialogActions, DialogTitle, TextField } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { editComment } from "../../managers/commentManager"
+import { editReply } from "../../managers/replyManager"
 
-export const CommentModal = ({ isOpen, toggle, submit, typeName }) => {
+export const CommentModal = ({ isOpen, toggle, submit, typeName, importForEdit }) => {
     const [input, setInput] = useState("")
     const [failedSubmit, setFailedSubmit] = useState(false)
-    
-    const handleSubmit = () => {
+    const [importedComment, setImportedComment] = useState(null)
+    const [importedReply, setImportedReply] = useState(null)
+
+    useEffect(() => {
+        if (!importForEdit) {
+            setImportedComment(null)
+            setImportedReply(null)
+            setInput("")
+        } else {
+            if (importForEdit.hasOwnProperty("buildId")) {
+                setImportedComment(importForEdit)
+                setInput(importForEdit.content)
+            } else if (importForEdit.hasOwnProperty("commentId")) {
+                setImportedReply(importForEdit)
+                setInput(importForEdit.content)
+            }
+        }
+    }, [importForEdit])
+
+    const createNew = () => {
         submit(input).then(success => {
             if (success) {
                 setFailedSubmit(false)
@@ -17,14 +37,66 @@ export const CommentModal = ({ isOpen, toggle, submit, typeName }) => {
             }
         })
     }
+
+    const editCurrentComment = () => {
+        const commentToEdit = {
+            id: importedComment.id,
+            content: input
+        }
+        
+        editComment(commentToEdit).then(success => {
+            if (success) {
+                setFailedSubmit(false)
+                importedComment.content = input
+                toggle()
+                setImportedComment(null)
+                setTimeout(() => {
+                    setInput("")
+                }, 200);
+            } else {
+                setFailedSubmit(true)
+            }
+        })
+    }
+
+    const editCurrentReply = () => {
+        const replyToEdit = {
+            id: importedReply.id,
+            content: input
+        }
+
+        editReply(replyToEdit).then(success => {
+            if (success) {
+                setFailedSubmit(false)
+                importedReply.content = input
+                toggle()
+                setImportedReply(null)
+                setTimeout(() => {
+                    setInput("")
+                }, 200);
+            } else {
+                setFailedSubmit(true)
+            }
+        })
+    }
+    
+    const handleSubmit = () => {
+        if (importedComment) {
+            editCurrentComment()
+        } else if (importedReply) {
+            editCurrentReply()
+        } else {
+            createNew()
+        }
+    }
         
     return (
         <Dialog open={isOpen} onClose={toggle} fullWidth>
-            <DialogTitle>Create {typeName}</DialogTitle>
+            <DialogTitle>{importForEdit ? "Edit" : "Create"} {typeName}</DialogTitle>
             <Box sx={{px: 2}}>
                 <TextField 
                     type="text"
-                    placeholder="Write comment here..."
+                    placeholder={`Write ${typeName.toLowerCase()} here...`}
                     autoFocus
                     multiline
                     fullWidth
