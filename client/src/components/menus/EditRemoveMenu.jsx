@@ -2,7 +2,7 @@ import MoreVert from "@mui/icons-material/MoreVert"
 import { IconButton, Menu, MenuItem } from "@mui/material"
 import { useState } from "react"
 
-export const EditRemoveMenu = () => {
+export const EditRemoveMenu = ({ editHandler }) => {
     const [anchorEl, setAnchorEl] = useState(null)
     const open = Boolean(anchorEl)
 
@@ -15,6 +15,7 @@ export const EditRemoveMenu = () => {
     }
 
     const handleEdit = () => {
+        editHandler()
         handleClose()
     }
     

@@ -9,3 +9,13 @@ export const createComment = (comment) => {
 
     return fetch(_apiUrl, postOptions)
 }
+
+export const editComment = (comment) => {
+    const putOptions = {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(comment)
+    }
+
+    return fetch(`${_apiUrl}/${comment.id}`, putOptions)
+}
