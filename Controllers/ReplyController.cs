@@ -67,4 +67,21 @@ public class ReplyController : ControllerBase
         
         return Created($"/builds/{foundComment.BuildId}", createdReply);
     }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public IActionResult Update(int id, ReplyUpdateDTO reply)
+    {
+        Reply replyToUpdate = _dbContext.Replies.SingleOrDefault(r => r.Id == id);
+        if (replyToUpdate == null)
+        {
+            return NotFound("Reply not found!");
+        }
+
+        replyToUpdate.Content = reply.Content;
+
+        _dbContext.SaveChanges();
+
+        return NoContent();
+    }
 }
