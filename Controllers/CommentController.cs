@@ -67,4 +67,21 @@ public class CommentController : ControllerBase
         
         return Created($"/builds/{createdComment.BuildId}", createdComment);
     }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public IActionResult Update(int id, CommentUpdateDTO comment)
+    {
+        Comment commentToUpdate = _dbContext.Comments.SingleOrDefault(c => c.Id == id);
+        if (commentToUpdate == null)
+        {
+            return NotFound("Comment not found");
+        }
+
+        commentToUpdate.Content = comment.Content;
+
+        _dbContext.SaveChanges();
+
+        return NoContent();
+    }
 }
