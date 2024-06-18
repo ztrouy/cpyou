@@ -19,3 +19,9 @@ export const editComment = (comment) => {
 
     return fetch(`${_apiUrl}/${comment.id}`, putOptions)
 }
+
+export const deleteComment = (commentId) => {
+    const deleteOptions = {method: "DELETE"}
+
+    return fetch(`${_apiUrl}/${commentId}`, deleteOptions)
+}
