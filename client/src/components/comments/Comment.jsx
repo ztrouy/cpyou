@@ -7,12 +7,16 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import EditRemoveMenu from "../menus/EditRemoveMenu.jsx";
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js";
 import CommentModal from "../modals/CommentModal.jsx";
-import { createReply } from "../../managers/replyManager.js";
+import { createReply, deleteReply } from "../../managers/replyManager.js";
+import DeleteModal from "../modals/DeleteModal.jsx";
+import { deleteComment } from "../../managers/commentManager.js";
 
 export const Comment = ({ comment, refreshPage }) => {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false)
     const [objectToEdit, setObjectToEdit] = useState(null)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [objectToDelete, setObjectToDelete] = useState(null)
     const [modalTypeName, setModalTypeName] = useState("")
     const { loggedInUser } = useAuthorizationProvider()
     
@@ -20,8 +24,12 @@ export const Comment = ({ comment, refreshPage }) => {
         setIsExpanded(!isExpanded)
     }
 
-    const toggleModal = () => {
-        setIsOpen(!isOpen)
+    const toggleCommentModal = () => {
+        setIsCommentModalOpen(!isCommentModalOpen)
+    }
+
+    const toggleDeleteModal = () => {
+        setIsDeleteModalOpen(!isDeleteModalOpen)
     }
 
     const handleSubmitReply = (input) => {
@@ -35,7 +43,7 @@ export const Comment = ({ comment, refreshPage }) => {
         return createReply(reply).then(res => {
             if (res.ok) {
                 refreshPage()
-                toggleModal()
+                toggleCommentModal()
                 setIsExpanded(true)
                 return true
             } else {
@@ -47,7 +55,7 @@ export const Comment = ({ comment, refreshPage }) => {
     const handleCommentButton = () => {
         setObjectToEdit(null)
         setModalTypeName("Reply")
-        toggleModal()
+        toggleCommentModal()
     }
     
     const handleEdit = (input) => {
@@ -59,7 +67,33 @@ export const Comment = ({ comment, refreshPage }) => {
             setModalTypeName("Reply")
         }
         
-        toggleModal()
+        toggleCommentModal()
+    }
+
+    const handleDeleteModal = (object) => {
+        if (object.hasOwnProperty("buildId")) {
+            setModalTypeName("Comment")
+        } else if (object.hasOwnProperty("commentId")) {
+            setModalTypeName("Reply")
+        }
+        
+        setObjectToDelete(object)
+        toggleDeleteModal()
+    }
+
+    const handleDelete = () => {
+        let deleteFunction
+        
+        if (objectToDelete.hasOwnProperty("buildId")) {
+            deleteFunction = deleteComment
+        } else if (objectToDelete.hasOwnProperty("commentId")) {
+            deleteFunction = deleteReply
+        }
+
+        deleteFunction(objectToDelete.id).then(() => {
+            toggleDeleteModal()
+            refreshPage()
+        })
     }
 
     return (
@@ -79,7 +113,7 @@ export const Comment = ({ comment, refreshPage }) => {
                         </Box>
                         {comment.userProfileId == loggedInUser.id && (
                             <Box sx={{display: {xs: "none", sm: "flex"}, flexGrow: 1, justifyContent: "end", alignItems: "start"}}>
-                                <EditRemoveMenu editHandler={() => handleEdit(comment)} />
+                                <EditRemoveMenu editHandler={() => handleEdit(comment)} deleteHandler={() => handleDeleteModal(comment)} />
                             </Box>
                         )}
                     </Box>
@@ -88,7 +122,7 @@ export const Comment = ({ comment, refreshPage }) => {
                         <IconButton onClick={() => handleCommentButton()}><CommentIcon fontSize="small"/></IconButton>
                         {comment.userProfileId == loggedInUser.id && (
                             <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                <EditRemoveMenu editHandler={() => handleEdit(comment)} />
+                                <EditRemoveMenu editHandler={() => handleEdit(comment)} deleteHandler={() => handleDeleteModal(comment)} />
                             </Box>
                         )}
                     </CardActions>
@@ -116,7 +150,7 @@ export const Comment = ({ comment, refreshPage }) => {
                                                     <Typography sx={{fontStyle: "italic", flexGrow: 1, textAlign: {xs: "end", sm: "start"}}} noWrap>{r.formattedDateCreated}</Typography>
                                                     {r.userProfileId == loggedInUser.id && (
                                                         <Box display={{xs: "none", sm: "inline-block"}}>
-                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} />
+                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} deleteHandler={() => handleDeleteModal(r)} />
                                                         </Box>
                                                     )}
                                                 </Box>
@@ -126,7 +160,7 @@ export const Comment = ({ comment, refreshPage }) => {
                                                     <IconButton onClick={() => handleCommentButton()}><CommentIcon fontSize="small"/></IconButton>
                                                     {r.userProfileId == loggedInUser.id && (
                                                         <Box sx={{display: {xs: "flex", sm: "none"}, flexGrow: 1, justifyContent: "end"}}>
-                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} />
+                                                            <EditRemoveMenu editHandler={() => handleEdit(r)} deleteHandler={() => handleDeleteModal(r)} />
                                                         </Box>
                                                     )}
                                                 </Box>
@@ -141,7 +175,8 @@ export const Comment = ({ comment, refreshPage }) => {
                     
                 </CardContent>
             </Card>
-            <CommentModal isOpen={isOpen} toggle={toggleModal} submit={handleSubmitReply} typeName={modalTypeName} importForEdit={objectToEdit} />
+            <CommentModal isOpen={isCommentModalOpen} toggle={toggleCommentModal} submit={handleSubmitReply} typeName={modalTypeName} importForEdit={objectToEdit} />
+            <DeleteModal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} confirmDelete={handleDelete} typeName={modalTypeName} />
         </>
     )
 }
