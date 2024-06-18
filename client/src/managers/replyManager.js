@@ -19,3 +19,9 @@ export const editReply = (reply) => {
 
     return fetch(`${_apiUrl}/${reply.id}`, putOptions)
 }
+
+export const deleteReply = (replyId) => {
+    const deleteOptions = {method: "DELETE"}
+
+    return fetch(`${_apiUrl}/${replyId}`, deleteOptions)
+}
