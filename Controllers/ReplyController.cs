@@ -84,4 +84,21 @@ public class ReplyController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public IActionResult Delete(int id)
+    {
+        Reply replyToDelete = _dbContext.Replies.SingleOrDefault(r => r.Id == id);
+        if (replyToDelete == null)
+        {
+            return NotFound();
+        }
+
+        _dbContext.Replies.Remove(replyToDelete);
+
+        _dbContext.SaveChanges();
+
+        return NoContent();
+    }
 }
