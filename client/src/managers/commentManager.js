@@ -1,5 +1,9 @@
 const _apiUrl = "/api/comment"
 
+export const getCommentsForHome = (userProfileId) => {
+    return fetch(`${_apiUrl}/${userProfileId}/home`).then(res => res.json())
+}
+
 export const createComment = (comment) => {
     const postOptions = {
         method: "POST",

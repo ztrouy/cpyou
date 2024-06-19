@@ -5,12 +5,13 @@ import Register from "./auth/Register";
 import BuildsList from "./builds/BuildsList.jsx";
 import BuildDetails from "./builds/BuildDetails.jsx";
 import BuildForm from "./builds/BuildForm.jsx";
+import Home from "./home/Home.jsx";
 
 export const ApplicationViews = () => {
     return (
         <Routes>
             <Route path="/" element={<AuthorizedRoute />}>
-                <Route index element={<>Home Page</>}/>
+                <Route index element={<Home/>}/>
                 <Route path="builds">
                     <Route index element={<BuildsList/>}/>
                     <Route path=":buildId">
