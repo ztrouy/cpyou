@@ -19,6 +19,62 @@ public class CommentController : ControllerBase
         _dbContext = context;
     }
 
+    [HttpGet("{id}/home")]
+    [Authorize]
+    public IActionResult GetForHomeView(int id)
+    {
+        List<CommentForHomeDTO> commentDTOs = _dbContext.Comments
+            .Include(c => c.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
+            .Include(c => c.Replies)
+            .ThenInclude(r => r.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
+            .Include(c => c.Build)
+            .Where(c => 
+                ((c.UserProfileId != id) & (c.Build.UserProfileId == id) & (c.Replies.OrderBy(r => r.Id).LastOrDefault().UserProfileId != id)) |
+                ((c.UserProfileId == id) & (c.Replies.Count > 0) & (c.Replies.OrderBy(r => r.Id).LastOrDefault().UserProfileId != id)) |
+                ((c.Replies.Any(r => r.UserProfileId == id)) & (c.Replies.OrderBy(r => r.Id).LastOrDefault().UserProfileId != id))
+            )
+            .Select(c => new CommentForHomeDTO()
+            {
+                Id = c.Id,
+                UserProfileId = c.UserProfileId,
+                BuildId = c.BuildId,
+                BuildName = c.Build.Name,
+                Content = c.Content,
+                DateCreated = c.DateCreated,
+                UserProfile = new UserProfileForCommentDTO()
+                {
+                    Id = c.UserProfile.Id,
+                    FirstName = c.UserProfile.FirstName,
+                    LastName = c.UserProfile.LastName,
+                    UserName = c.UserProfile.IdentityUser.UserName,
+                    ImageLocation = c.UserProfile.ImageLocation
+                },
+                Replies = c.Replies.Select(r => new ReplyForCommentDTO()
+                {
+                    Id = r.Id,
+                    CommentId = r.CommentId,
+                    UserProfileId = r.UserProfileId,
+                    Content = r.Content,
+                    DateCreated = r.DateCreated,
+                    UserProfile = new UserProfileForReplyDTO()
+                    {
+                        Id = r.UserProfile.Id,
+                        FirstName = r.UserProfile.FirstName,
+                        LastName = r.UserProfile.LastName,
+                        ImageLocation = r.UserProfile.ImageLocation,
+                        UserName = r.UserProfile.IdentityUser.UserName
+                    }
+                }).OrderBy(r => r.DateCreated).ToList()
+            })
+            .OrderByDescending(c => c.Replies.Count == 0 ? (c.DateCreated) : (c.Replies.Last().DateCreated))
+            .Take(3)
+            .ToList();
+
+        return Ok(commentDTOs);
+    }
+
     [HttpPost]
     [Authorize]
     public IActionResult Create(CommentCreateDTO comment)
