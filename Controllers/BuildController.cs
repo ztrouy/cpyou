@@ -65,6 +65,7 @@ public class BuildController : ControllerBase
             .ThenInclude(bc => bc.Component)
             .Include(b => b.Comments)
             .ThenInclude(c => c.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
             .Include(b => b.Comments)
             .ThenInclude(c => c.Replies)
             .ThenInclude(r => r.UserProfile)
