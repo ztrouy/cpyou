@@ -1,5 +1,6 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
+import { Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom";
 import AddReaction from "@mui/icons-material/AddReaction";
 import CommentIcon from "@mui/icons-material/Comment";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -19,6 +20,8 @@ export const CommentForHome = ({ comment, refreshPage }) => {
     const [objectToDelete, setObjectToDelete] = useState(null)
     const [modalTypeName, setModalTypeName] = useState("")
     const { loggedInUser } = useAuthorizationProvider()
+
+    const navigate = useNavigate()
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded)
@@ -100,7 +103,9 @@ export const CommentForHome = ({ comment, refreshPage }) => {
         <>
             <Card sx={{pt: 1}}>
                 <CardContent>
-                    <Typography variant="h5" sx={{mb: 2}}>{comment.buildName}</Typography>
+                    <ButtonBase onClick={() => navigate(`/builds/${comment.buildId}`)}>
+                        <Typography variant="h5" sx={{mb: 2}}>{comment.buildName}</Typography>
+                    </ButtonBase>
                     <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
                         <Avatar 
                             src={comment.userProfile.imageLocation}
