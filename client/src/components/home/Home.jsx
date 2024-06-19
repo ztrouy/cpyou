@@ -28,6 +28,9 @@ export const Home = () => {
                     {comments.map(c => (
                         <CommentForHome comment={c} refreshPage={refreshPage} />
                     ))}
+                    {comments.length == 0 && (
+                        <Typography fontStyle={"italic"} textAlign={"center"}>No recent interactions</Typography>
+                    )}
                 </Box>
             </Box>
         </Container>
