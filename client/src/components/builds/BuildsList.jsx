@@ -35,7 +35,7 @@ export const BuildsList = () => {
                                 </Box>
                             </Box>
                             <Typography>{b.userProfile.userName}</Typography>
-                            <Typography sx={{fontStyle: "italic"}}>{`${b.componentsQuantity} components`}</Typography>
+                            <Typography sx={{fontStyle: "italic"}}>{`${b.wattage}W`}</Typography>
                             <Typography sx={{fontStyle: "italic"}}>{`${b.commentsQuantity} ${b.commentsQuantity == 1 ? "comment" : "comments"}`}</Typography>
                         </Paper>
                     ))}
