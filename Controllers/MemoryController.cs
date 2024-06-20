@@ -10,11 +10,11 @@ namespace CPYou.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ComponentController : ControllerBase
+public class MemoryController : ControllerBase
 {
     private CPYouDbContext _dbContext;
 
-    public ComponentController(CPYouDbContext context)
+    public MemoryController(CPYouDbContext context)
     {
         _dbContext = context;
     }
@@ -23,15 +23,17 @@ public class ComponentController : ControllerBase
     [Authorize]
     public IActionResult Get()
     {
-        List<ComponentNoNavDTO> componentDTOs = _dbContext.Components
-            .Select(c => new ComponentNoNavDTO()
+        List<MemoryNoNavDTO> memoryDTOs = _dbContext.Memories
+            .Select(m => new MemoryNoNavDTO()
             {
-                Id = c.Id,
-                Name = c.Name,
-                Price = c.Price
+                Id = m.Id,
+                Name = m.Name,
+                InterfaceId = m.InterfaceId,
+                SizeGB = m.SizeGB,
+                Price = m.Price
             })
             .ToList();
         
-        return Ok(componentDTOs);
+        return Ok(memoryDTOs);
     }
 }

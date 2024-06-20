@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CPYou.Models.DTOs;
 
-public class BuildComponentCreateDTO
+public class BuildStorageCreateDTO
 {
     [Required]
-    public int ComponentId { get; set; }
+    public int StorageId { get; set; }
 
     [Required]
     public int Quantity { get; set; }

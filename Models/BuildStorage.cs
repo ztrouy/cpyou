@@ -2,19 +2,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CPYou.Models;
 
-public class BuildComponent
+public class BuildStorage
 {
     [Required]
     public int BuildId { get; set; }
 
     [Required]
-    public int ComponentId { get; set; }
+    public int StorageId { get; set; }
 
     [Required]
     public int Quantity { get; set; }
 
     // Navigation Properties
     public Build Build { get; set; }
-    
-    public Component Component { get; set; }
+
+    public Storage Storage { get; set; }
 }

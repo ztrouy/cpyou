@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CPYou.Models;
+namespace CPYou.Models.DTOs;
 
-public class Component
+public class CPUNoNavDTO
 {
     public int Id { get; set; }
 
@@ -12,6 +12,9 @@ public class Component
     [Required]
     public decimal Price { get; set; }
 
-    // Navigation Properties
-    public List<BuildComponent> BuildComponents { get; set; }
+    [Required]
+    public int InterfaceId { get; set; }
+
+    [Required]
+    public int TDP { get; set; }
 }

@@ -1,20 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CPYou.Models.DTOs;
+namespace CPYou.Models;
 
-public class BuildComponentDTO
+public class BuildMemory
 {
     [Required]
     public int BuildId { get; set; }
 
     [Required]
-    public int ComponentId { get; set; }
+    public int MemoryId { get; set; }
 
     [Required]
     public int Quantity { get; set; }
 
     // Navigation Properties
-    public BuildDTO Build { get; set; }
-    
-    public ComponentDTO Component { get; set; }
+    public Build Build { get; set; }
+
+    public Memory Memory { get; set; }
 }

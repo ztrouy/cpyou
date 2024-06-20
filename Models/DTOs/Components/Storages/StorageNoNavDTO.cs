@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CPYou.Models.DTOs;
 
-public class BuildComponentForEditFormDTO
+public class StorageNoNavDTO
 {
-    [Required]
     public int Id { get; set; }
 
     [Required]
@@ -14,5 +13,8 @@ public class BuildComponentForEditFormDTO
     public decimal Price { get; set; }
 
     [Required]
-    public int Quantity { get; set; }
+    public int InterfaceId { get; set; }
+
+    [Required]
+    public int SizeGB { get; set; }
 }

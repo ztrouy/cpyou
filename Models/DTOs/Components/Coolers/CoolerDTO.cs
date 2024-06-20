@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CPYou.Models.DTOs;
 
-public class ComponentDTO
+public class CoolerDTO
 {
     public int Id { get; set; }
 
@@ -12,6 +12,9 @@ public class ComponentDTO
     [Required]
     public decimal Price { get; set; }
 
+    [Required]
+    public int TDP { get; set; }
+
     // Navigation Properties
-    public List<BuildComponentDTO> BuildComponents { get; set; }
+    public List<BuildDTO> Builds { get; set; }
 }
