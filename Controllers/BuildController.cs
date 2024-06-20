@@ -45,6 +45,7 @@ public class BuildController : ControllerBase
                 Name = b.Name,
                 DateCreated = b.DateCreated,
                 Wattage = b.Wattage,
+                TotalPrice = b.TotalPrice,
                 CommentsQuantity = b.Comments.Sum(c => c.Replies.Count + 1),
                 UserProfile = new UserProfileForBuildDTO()
                 {
