@@ -26,8 +26,15 @@ public class BuildController : ControllerBase
         List<BuildForListDTO> buildDTOs = _dbContext.Builds
             .Include(b => b.UserProfile)
             .ThenInclude(up => up.IdentityUser)
-            .Include(b => b.BuildComponents)
-            .ThenInclude(bc => bc.Component)
+            .Include(b => b.CPU)
+            .Include(b => b.GPU)
+            .Include(b => b.PSU)
+            .Include(b => b.Motherboard)
+            .Include(b => b.Cooler)
+            .Include(b => b.BuildMemories)
+            .ThenInclude(bm => bm.Memory)
+            .Include(b => b.BuildStorages)
+            .ThenInclude(bs => bs.Storage)
             .Include(b => b.Comments)
             .ThenInclude(c => c.Replies)
             .OrderByDescending(b => b.DateCreated)
@@ -37,8 +44,7 @@ public class BuildController : ControllerBase
                 UserProfileId = b.UserProfileId,
                 Name = b.Name,
                 DateCreated = b.DateCreated,
-                TotalPrice = b.BuildComponents.Sum(bc => bc.Component.Price * bc.Quantity),
-                ComponentsQuantity = b.BuildComponents.Sum(bc => bc.Quantity),
+                Wattage = b.Wattage,
                 CommentsQuantity = b.Comments.Sum(c => c.Replies.Count + 1),
                 UserProfile = new UserProfileForBuildDTO()
                 {
@@ -61,8 +67,15 @@ public class BuildController : ControllerBase
         BuildForBuildDetailsDTO buildDTO = _dbContext.Builds
             .Include(b => b.UserProfile)
             .ThenInclude(up => up.IdentityUser)
-            .Include(b => b.BuildComponents)
-            .ThenInclude(bc => bc.Component)
+            .Include(b => b.CPU)
+            .Include(b => b.GPU)
+            .Include(b => b.PSU)
+            .Include(b => b.Motherboard)
+            .Include(b => b.Cooler)
+            .Include(b => b.BuildMemories)
+            .ThenInclude(bm => bm.Memory)
+            .Include(b => b.BuildStorages)
+            .ThenInclude(bs => bs.Storage)
             .Include(b => b.Comments)
             .ThenInclude(c => c.UserProfile)
             .ThenInclude(up => up.IdentityUser)
@@ -77,13 +90,75 @@ public class BuildController : ControllerBase
                 Name = b.Name,
                 Content = b.Content,
                 DateCreated = b.DateCreated,
-                Components = b.BuildComponents.Select(bc => new ComponentForBuildDTO()
+                Wattage = b.Wattage,
+                CPUId = b.CPUId,
+                CoolerId = b.CoolerId,
+                GPUId = b.GPUId,
+                MotherboardId = b.MotherboardId,
+                PSUId = b.PSUId,
+                TotalPrice = b.TotalPrice,
+                CPU = new CPUForBuildDTO()
                 {
-                    Id = bc.Component.Id,
-                    Name = bc.Component.Name,
-                    Price = bc.Component.Price,
-                    Quantity = bc.Quantity
-                }).ToList(),
+                    Id = b.CPU.Id,
+                    Name = b.CPU.Name,
+                    TDP = b.CPU.TDP,
+                    InterfaceId = b.CPU.InterfaceId,
+                    Price = b.CPU.Price
+                },
+                GPU = new GPUForBuildDTO()
+                {
+                    Id = b.GPU.Id,
+                    Name = b.GPU.Name,
+                    TDP = b.GPU.TDP,
+                    InterfaceId = b.GPU.InterfaceId,
+                    Price = b.GPU.Price
+                },
+                PSU = new PSUNoNavDTO()
+                {
+                    Id = b.PSU.Id,
+                    Name = b.PSU.Name,
+                    Wattage = b.PSU.Wattage,
+                    Price = b.PSU.Price
+                },
+                Cooler = new CoolerNoNavDTO()
+                {
+                    Id = b.Cooler.Id,
+                    Name = b.Cooler.Name,
+                    TDP = b.Cooler.TDP,
+                    Price = b.Cooler.Price
+                },
+                Motherboard = new MotherboardForBuildDTO()
+                {
+                    Id = b.Motherboard.Id,
+                    Name = b.Motherboard.Name,
+                    Price = b.Motherboard.Price,
+                    CPUInterfaceId = b.Motherboard.CPUInterfaceId,
+                    GPUInterfaceId = b.Motherboard.GPUInterfaceId,
+                    MemoryInterfaceId = b.Motherboard.MemoryInterfaceId,
+                    MemorySlots = b.Motherboard.MemorySlots,
+                    M2StorageSlots = b.Motherboard.M2StorageSlots,
+                    SataStorageSlots = b.Motherboard.SataStorageSlots
+                },
+                Memory = b.BuildMemories.Select(bm => new MemoryForBuildDetailsDTO()
+                {
+                    Id = bm.Memory.Id,
+                    Name = bm.Memory.Name,
+                    SizeGB = bm.Memory.SizeGB,
+                    InterfaceId = bm.Memory.InterfaceId,
+                    Price = bm.Memory.Price,
+                    Quantity = bm.Quantity
+                }
+                ).ToList(),
+                Storage = b.BuildStorages.Select(bs => new StorageForBuildDetailsDTO()
+                {
+                    Id = bs.Storage.Id,
+                    Name = bs.Storage.Name,
+                    SizeGB = bs.Storage.SizeGB,
+                    InterfaceId = bs.Storage.InterfaceId,
+                    Price = bs.Storage.Price,
+                    Quantity = bs.Quantity
+                }
+                ).ToList(),
                 UserProfile = new UserProfileForBuildDTO()
                 {
                     Id = b.UserProfile.Id,
@@ -141,21 +216,38 @@ public class BuildController : ControllerBase
     {
         BuildForEditFormDTO buildDTO = _dbContext.Builds
             .Include(b => b.UserProfile)
-            .Include(b => b.BuildComponents)
-            .ThenInclude(bc => bc.Component)
+            .Include(b => b.BuildMemories)
+            .ThenInclude(bm => bm.Memory)
+            .Include(b => b.BuildStorages)
+            .ThenInclude(bs => bs.Storage)
             .Select(b => new BuildForEditFormDTO()
             {
                 Id = b.Id,
-                UserProfileId = b.UserProfileId,
                 Name = b.Name,
                 Content = b.Content,
-                Components = b.BuildComponents.Select(bc => new BuildComponentForEditFormDTO()
+                CPUId = b.CPUId,
+                CoolerId = b.CoolerId,
+                GPUId = b.GPUId,
+                MotherboardId = b.MotherboardId,
+                PSUId = b.PSUId,
+                BuildMemories = b.BuildMemories.Select(bm => new BuildMemoryForEditFormDTO()
                 {
-                    Id = bc.ComponentId,
-                    Name = bc.Component.Name,
-                    Price = bc.Component.Price,
-                    Quantity = bc.Quantity
-                }).ToList()
+                    Id = bm.Memory.Id,
+                    Name = bm.Memory.Name,
+                    InterfaceId = bm.Memory.InterfaceId,
+                    Price = bm.Memory.Price,
+                    Quantity = bm.Quantity
+                }
+                ).ToList(),
+                BuildStorages = b.BuildStorages.Select(bs => new BuildStorageForEditFormDTO()
+                {
+                    Id = bs.Storage.Id,
+                    Name = bs.Storage.Name,
+                    InterfaceId = bs.Storage.InterfaceId,
+                    Price = bs.Storage.Price,
+                    Quantity = bs.Quantity
+                }
+                ).ToList(),
                 
             })
             .SingleOrDefault(b => b.Id == id);
@@ -183,22 +275,39 @@ public class BuildController : ControllerBase
             Name = build.Name,
             Content = build.Content,
             UserProfileId = build.UserProfileId,
-            DateCreated = DateTime.Now
+            DateCreated = DateTime.Now,
+            CPUId = build.CPUId,
+            CoolerId = build.CoolerId,
+            GPUId = build.GPUId,
+            MotherboardId = build.MotherboardId,
+            PSUId = build.PSUId
         };
 
         _dbContext.Builds.Add(newBuild);
         _dbContext.SaveChanges();
 
-        foreach (BuildComponentCreateDTO bc in build.Components)
+        foreach (BuildMemoryCreateDTO bm in build.BuildMemories)
         {
-            BuildComponent buildComponent = new BuildComponent()
+            BuildMemory buildMemory = new BuildMemory()
             {
                 BuildId = newBuild.Id,
-                ComponentId = bc.ComponentId,
-                Quantity = bc.Quantity
+                MemoryId = bm.MemoryId,
+                Quantity = bm.Quantity
             };
 
-            _dbContext.BuildComponents.Add(buildComponent);
+            _dbContext.BuildMemories.Add(buildMemory);
+        }
+
+        foreach (BuildStorageCreateDTO bs in build.BuildStorages)
+        {
+            BuildStorage buildStorage = new BuildStorage()
+            {
+                BuildId = newBuild.Id,
+                StorageId = bs.StorageId,
+                Quantity = bs.Quantity
+            };
+
+            _dbContext.BuildStorages.Add(buildStorage);
         }
 
         _dbContext.SaveChanges();
@@ -206,8 +315,15 @@ public class BuildController : ControllerBase
         BuildForBuildDetailsDTO createdBuild = _dbContext.Builds
             .Include(b => b.UserProfile)
             .ThenInclude(up => up.IdentityUser)
-            .Include(b => b.BuildComponents)
-            .ThenInclude(bc => bc.Component)
+            .Include(b => b.CPU)
+            .Include(b => b.GPU)
+            .Include(b => b.PSU)
+            .Include(b => b.Motherboard)
+            .Include(b => b.Cooler)
+            .Include(b => b.BuildMemories)
+            .ThenInclude(bm => bm.Memory)
+            .Include(b => b.BuildStorages)
+            .ThenInclude(bs => bs.Storage)
             .Select(b => new BuildForBuildDetailsDTO()
             {
                 Id = b.Id,
@@ -215,13 +331,75 @@ public class BuildController : ControllerBase
                 Name = b.Name,
                 Content = b.Content,
                 DateCreated = b.DateCreated,
-                Components = b.BuildComponents.Select(bc => new ComponentForBuildDTO()
+                Wattage = b.Wattage,
+                CPUId = b.CPUId,
+                CoolerId = b.CoolerId,
+                GPUId = b.GPUId,
+                MotherboardId = b.MotherboardId,
+                PSUId = b.PSUId,
+                TotalPrice = b.TotalPrice,
+                CPU = new CPUForBuildDTO()
                 {
-                    Id = bc.Component.Id,
-                    Name = bc.Component.Name,
-                    Price = bc.Component.Price,
-                    Quantity = bc.Quantity
-                }).ToList(),
+                    Id = b.CPU.Id,
+                    Name = b.CPU.Name,
+                    TDP = b.CPU.TDP,
+                    InterfaceId = b.CPU.InterfaceId,
+                    Price = b.CPU.Price
+                },
+                GPU = new GPUForBuildDTO()
+                {
+                    Id = b.GPU.Id,
+                    Name = b.GPU.Name,
+                    TDP = b.GPU.TDP,
+                    InterfaceId = b.GPU.InterfaceId,
+                    Price = b.GPU.Price
+                },
+                PSU = new PSUNoNavDTO()
+                {
+                    Id = b.PSU.Id,
+                    Name = b.PSU.Name,
+                    Wattage = b.PSU.Wattage,
+                    Price = b.PSU.Price
+                },
+                Cooler = new CoolerNoNavDTO()
+                {
+                    Id = b.Cooler.Id,
+                    Name = b.Cooler.Name,
+                    TDP = b.Cooler.TDP,
+                    Price = b.Cooler.Price
+                },
+                Motherboard = new MotherboardForBuildDTO()
+                {
+                    Id = b.Motherboard.Id,
+                    Name = b.Motherboard.Name,
+                    Price = b.Motherboard.Price,
+                    CPUInterfaceId = b.Motherboard.CPUInterfaceId,
+                    GPUInterfaceId = b.Motherboard.GPUInterfaceId,
+                    MemoryInterfaceId = b.Motherboard.MemoryInterfaceId,
+                    MemorySlots = b.Motherboard.MemorySlots,
+                    M2StorageSlots = b.Motherboard.M2StorageSlots,
+                    SataStorageSlots = b.Motherboard.SataStorageSlots
+                },
+                Memory = b.BuildMemories.Select(bm => new MemoryForBuildDetailsDTO()
+                {
+                    Id = bm.Memory.Id,
+                    Name = bm.Memory.Name,
+                    SizeGB = bm.Memory.SizeGB,
+                    InterfaceId = bm.Memory.InterfaceId,
+                    Price = bm.Memory.Price,
+                    Quantity = bm.Quantity
+                }
+                ).ToList(),
+                Storage = b.BuildStorages.Select(bs => new StorageForBuildDetailsDTO()
+                {
+                    Id = bs.Storage.Id,
+                    Name = bs.Storage.Name,
+                    SizeGB = bs.Storage.SizeGB,
+                    InterfaceId = bs.Storage.InterfaceId,
+                    Price = bs.Storage.Price,
+                    Quantity = bs.Quantity
+                }
+                ).ToList(),
                 UserProfile = new UserProfileForBuildDTO()
                 {
                     Id = b.UserProfile.Id,
@@ -248,28 +426,54 @@ public class BuildController : ControllerBase
         
         buildToEdit.Name = build.Name;
         buildToEdit.Content = build.Content;
+        buildToEdit.CPUId = build.CPUId;
+        buildToEdit.PSUId = build.PSUId;
+        buildToEdit.GPUId = build.GPUId;
+        buildToEdit.CoolerId = build.CoolerId;
+        buildToEdit.MotherboardId = build.MotherboardId;
 
-        List<BuildComponent> buildComponentsToDelete = _dbContext.BuildComponents
-            .Where(bc => bc.BuildId == id)
+        List<BuildMemory> buildMemoriesToDelete = _dbContext.BuildMemories
+            .Where(bm => bm.BuildId == id)
             .ToList();
 
-        foreach (BuildComponent bc in buildComponentsToDelete)
+        foreach (BuildMemory bm in buildMemoriesToDelete)
         {
-            _dbContext.BuildComponents.Remove(bc);
+            _dbContext.BuildMemories.Remove(bm);
+        }
+
+        List<BuildStorage> buildStoragesToDelete = _dbContext.BuildStorages
+            .Where(bs => bs.BuildId == id)
+            .ToList();
+
+        foreach (BuildStorage bs in buildStoragesToDelete)
+        {
+            _dbContext.BuildStorages.Remove(bs);
         }
 
         _dbContext.SaveChanges();
 
-        foreach (BuildComponentCreateDTO bc in build.Components)
+        foreach (BuildMemoryCreateDTO bm in build.BuildMemories)
         {
-            BuildComponent buildComponent = new BuildComponent()
+            BuildMemory buildMemory = new BuildMemory()
             {
-                BuildId = id,
-                ComponentId = bc.ComponentId,
-                Quantity = bc.Quantity
+                BuildId = buildToEdit.Id,
+                MemoryId = bm.MemoryId,
+                Quantity = bm.Quantity
             };
 
-            _dbContext.BuildComponents.Add(buildComponent);
+            _dbContext.BuildMemories.Add(buildMemory);
+        }
+
+        foreach (BuildStorageCreateDTO bs in build.BuildStorages)
+        {
+            BuildStorage buildStorage = new BuildStorage()
+            {
+                BuildId = buildToEdit.Id,
+                StorageId = bs.StorageId,
+                Quantity = bs.Quantity
+            };
+
+            _dbContext.BuildStorages.Add(buildStorage);
         }
 
         _dbContext.SaveChanges();
