@@ -17,7 +17,7 @@ public class BuildForListDTO
 
     public decimal TotalPrice { get; set; }
 
-    public int ComponentsQuantity { get; set; }
+    public int Wattage { get; set; }
 
     public int CommentsQuantity { get; set; }
 

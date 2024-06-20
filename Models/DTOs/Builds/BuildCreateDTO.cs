@@ -14,5 +14,23 @@ public class BuildCreateDTO
     public string Content { get; set; }
 
     [Required]
-    public List<BuildComponentCreateDTO> Components { get; set; }
+    public int CPUId { get; set; }
+
+    [Required]
+    public int CoolerId { get; set; }
+
+    [Required]
+    public int GPUId { get; set; }
+
+    [Required]
+    public int MotherboardId { get; set; }
+
+    [Required]
+    public int PSUId { get; set; }
+
+    [Required]
+    public List<BuildMemoryCreateDTO> BuildMemories { get; set; }
+
+    [Required]
+    public List<BuildStorageCreateDTO> BuildStorages { get; set; }
 }
