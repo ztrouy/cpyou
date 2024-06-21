@@ -4,6 +4,10 @@ export const getBuilds = () => {
     return fetch(_apiUrl).then(res => res.json())
 }
 
+export const getBuildsByUser = (userId) => {
+    return fetch(`${_apiUrl}/user/${userId}`).then(res => res.json())
+}
+
 export const getSingleBuild = (buildId) => {
     return fetch(`${_apiUrl}/${buildId}`).then(res => res.json())
 }

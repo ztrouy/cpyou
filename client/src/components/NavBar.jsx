@@ -21,6 +21,9 @@ export const NavBar = () => {
                         <Button variant="text" href="/builds" sx={{color: "white"}}>
                             Builds
                         </Button>
+                        <Button variant="text" href="/builds/my" sx={{color: "white"}}>
+                            My Builds
+                        </Button>
                         <Button variant="text" href="/builds/new" sx={{color: "white"}}>
                             New Build
                         </Button>

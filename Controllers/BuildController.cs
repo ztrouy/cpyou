@@ -61,6 +61,49 @@ public class BuildController : ControllerBase
         return Ok(buildDTOs);
     }
 
+    [HttpGet("user/{id}")]
+    [Authorize]
+    public IActionResult GetByUser(int id)
+    {
+        List<BuildForListDTO> buildDTOs = _dbContext.Builds
+            .Where(b => b.UserProfileId == id)
+            .Include(b => b.UserProfile)
+            .ThenInclude(up => up.IdentityUser)
+            .Include(b => b.CPU)
+            .Include(b => b.GPU)
+            .Include(b => b.PSU)
+            .Include(b => b.Motherboard)
+            .Include(b => b.Cooler)
+            .Include(b => b.BuildMemories)
+            .ThenInclude(bm => bm.Memory)
+            .Include(b => b.BuildStorages)
+            .ThenInclude(bs => bs.Storage)
+            .Include(b => b.Comments)
+            .ThenInclude(c => c.Replies)
+            .OrderByDescending(b => b.DateCreated)
+            .Select(b => new BuildForListDTO()
+            {
+                Id = b.Id,
+                UserProfileId = b.UserProfileId,
+                Name = b.Name,
+                DateCreated = b.DateCreated,
+                Wattage = b.Wattage,
+                TotalPrice = b.TotalPrice,
+                CommentsQuantity = b.Comments.Sum(c => c.Replies.Count + 1),
+                UserProfile = new UserProfileForBuildDTO()
+                {
+                    Id = b.UserProfile.Id,
+                    FirstName = b.UserProfile.FirstName,
+                    LastName = b.UserProfile.LastName,
+                    UserName = b.UserProfile.IdentityUser.UserName,
+                    ImageLocation = b.UserProfile.ImageLocation
+                }
+            })
+            .ToList();
+        
+        return Ok(buildDTOs);
+    }
+
     [HttpGet("{id}")]
     [Authorize]
     public IActionResult GetSingle(int id)

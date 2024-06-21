@@ -6,6 +6,7 @@ import BuildsList from "./builds/BuildsList.jsx";
 import BuildDetails from "./builds/BuildDetails.jsx";
 import BuildForm from "./builds/BuildForm.jsx";
 import Home from "./home/Home.jsx";
+import MyBuildsList from "./builds/MyBuildsList.jsx";
 
 export const ApplicationViews = () => {
     return (
@@ -21,6 +22,7 @@ export const ApplicationViews = () => {
                     <Route path="new">
                         <Route index element={<BuildForm/>}/>
                     </Route>
+                    <Route path="my" element={<MyBuildsList/>}/>
                 </Route>
             </Route>
             <Route path="login" element={<Login/>}/>
