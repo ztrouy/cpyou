@@ -9,6 +9,8 @@ This website aims to solve these issues with a dual-pronged approach:
 ## Technologies Used
 - ReactJS
 - MUI v5
+- C#
+- .Net 8.0
 - EF Core 8.0
 - PostgreSQL 16
 - JavaScript
