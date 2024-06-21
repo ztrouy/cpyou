@@ -224,6 +224,7 @@ public class BuildController : ControllerBase
             .Select(b => new BuildForEditFormDTO()
             {
                 Id = b.Id,
+                UserProfileId = b.UserProfileId,
                 Name = b.Name,
                 Content = b.Content,
                 CPUId = b.CPUId,
@@ -237,6 +238,7 @@ public class BuildController : ControllerBase
                     Name = bm.Memory.Name,
                     InterfaceId = bm.Memory.InterfaceId,
                     Price = bm.Memory.Price,
+                    SizeGB = bm.Memory.SizeGB,
                     Quantity = bm.Quantity
                 }
                 ).ToList(),
@@ -246,6 +248,7 @@ public class BuildController : ControllerBase
                     Name = bs.Storage.Name,
                     InterfaceId = bs.Storage.InterfaceId,
                     Price = bs.Storage.Price,
+                    SizeGB = bs.Storage.SizeGB,
                     Quantity = bs.Quantity
                 }
                 ).ToList(),
