@@ -17,5 +17,8 @@ public class BuildMemoryForEditFormDTO
     public decimal Price { get; set; }
 
     [Required]
+    public int SizeGB { get; set; }
+
+    [Required]
     public int Quantity { get; set; }
 }

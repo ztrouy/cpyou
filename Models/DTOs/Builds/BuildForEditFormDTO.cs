@@ -6,6 +6,9 @@ public class BuildForEditFormDTO
 {    
     [Required]
     public int Id { get; set; }
+
+    [Required]
+    public int UserProfileId { get; set; }
     
     [Required]
     public string Name { get; set; }
