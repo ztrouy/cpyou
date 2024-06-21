@@ -148,11 +148,11 @@ export const BuildForm = () => {
     }
 
     const calculateTotal = () => {
-        let cpuCost = build.cpuId != 0 ? cpus.find(c => c.id == build.cpuId).price : 0
-        let gpuCost = build.gpuId != 0 ? gpus.find(c => c.id == build.gpuId).price : 0
-        let psuCost = build.psuId != 0 ? psus.find(c => c.id == build.psuId).price : 0
-        let coolerCost = build.coolerId != 0 ? coolers.find(c => c.id == build.coolerId).price : 0
-        let motherboardCost = build.motherboardId != 0 ? motherboards.find(c => c.id == build.motherboardId).price : 0
+        let cpuCost = build.cpuId != 0 ? cpus.find(c => c.id == build.cpuId)?.price : 0
+        let gpuCost = build.gpuId != 0 ? gpus.find(c => c.id == build.gpuId)?.price : 0
+        let psuCost = build.psuId != 0 ? psus.find(c => c.id == build.psuId)?.price : 0
+        let coolerCost = build.coolerId != 0 ? coolers.find(c => c.id == build.coolerId)?.price : 0
+        let motherboardCost = build.motherboardId != 0 ? motherboards.find(c => c.id == build.motherboardId)?.price : 0
         let memoryCost = build.buildMemories.reduce((n, {price, quantity}) => n + (price * quantity), 0)
         let storageCost = build.buildStorages.reduce((n, {price, quantity}) => n + (price * quantity), 0)
 
@@ -162,15 +162,19 @@ export const BuildForm = () => {
     }
 
     const calculateWattage = () => {
-        let cpuWattage = build.cpuId != 0 ? cpus.find(c => c.id == build.cpuId).tdp : 0
-        let gpuWattage = build.gpuId != 0 ? gpus.find(g => g.id == build.gpuId).tdp : 0
+        let cpuWattage = build.cpuId != 0 ? cpus.find(c => c.id == build.cpuId)?.tdp : 0
+        let gpuWattage = build.gpuId != 0 ? gpus.find(g => g.id == build.gpuId)?.tdp : 0
 
         let totalWattage = Math.ceil((cpuWattage + gpuWattage) * 1.2)
 
         return totalWattage
     }
 
-    if (!build) return <CircularProgress sx={{m: "auto"}}/>
+    if (!build || cpus.length == 0 || gpus.length == 0 || psus.length == 0 || 
+        coolers.length == 0 || motherboards.length == 0 || memory.length == 0 || 
+        storage.length == 0) {
+        return <CircularProgress/>
+    }
 
     return (
         <Container>
@@ -335,41 +339,41 @@ export const BuildForm = () => {
                         {build.cpuId != 0 && (
                             <Stack direction={"row"}>
                                 <Stack flexGrow={1}>
-                                    <Typography>{cpus.find(c => c.id == build.cpuId).name}</Typography>
+                                    <Typography>{cpus.find(c => c.id == build.cpuId)?.name}</Typography>
                                 </Stack>
-                                <Typography>${cpus.find(c => c.id == build.cpuId).price}</Typography>
+                                <Typography>${cpus.find(c => c.id == build.cpuId)?.price}</Typography>
                             </Stack>
                         )}
                         {build.gpuId != 0 && (
                             <Stack direction={"row"}>
                                 <Stack flexGrow={1}>
-                                    <Typography>{gpus.find(c => c.id == build.gpuId).name}</Typography>
+                                    <Typography>{gpus.find(c => c.id == build.gpuId)?.name}</Typography>
                                 </Stack>
-                                <Typography>${gpus.find(c => c.id == build.gpuId).price}</Typography>
+                                <Typography>${gpus.find(c => c.id == build.gpuId)?.price}</Typography>
                             </Stack>
                         )}
                         {build.psuId != 0 && (
                             <Stack direction={"row"}>
                                 <Stack flexGrow={1}>
-                                    <Typography>{psus.find(c => c.id == build.psuId).name}</Typography>
+                                    <Typography>{psus.find(c => c.id == build.psuId)?.name}</Typography>
                                 </Stack>
-                                <Typography>${psus.find(c => c.id == build.psuId).price}</Typography>
+                                <Typography>${psus.find(c => c.id == build.psuId)?.price}</Typography>
                             </Stack>
                         )}
                         {build.coolerId != 0 && (
                             <Stack direction={"row"}>
                                 <Stack flexGrow={1}>
-                                    <Typography>{coolers.find(c => c.id == build.coolerId).name}</Typography>
+                                    <Typography>{coolers.find(c => c.id == build.coolerId)?.name}</Typography>
                                 </Stack>
-                                <Typography>${coolers.find(c => c.id == build.coolerId).price}</Typography>
+                                <Typography>${coolers.find(c => c.id == build.coolerId)?.price}</Typography>
                             </Stack>
                         )}
                         {build.motherboardId != 0 && (
                             <Stack direction={"row"}>
                                 <Stack flexGrow={1}>
-                                    <Typography>{motherboards.find(c => c.id == build.motherboardId).name}</Typography>
+                                    <Typography>{motherboards.find(c => c.id == build.motherboardId)?.name}</Typography>
                                 </Stack>
-                                <Typography>${motherboards.find(c => c.id == build.motherboardId).price}</Typography>
+                                <Typography>${motherboards.find(c => c.id == build.motherboardId)?.price}</Typography>
                             </Stack>
                         )}
                     </Stack>
