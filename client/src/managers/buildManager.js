@@ -24,7 +24,7 @@ export const createBuild = (build) => {
     return fetch(_apiUrl, postOptions).then(res => res.headers.get("Location"))
 }
 
-export const updateBuild = (buildId, build) => {
+export const updateBuild = (build) => {
     const putOptions = {
         method: "PUT",
         headers: {
@@ -33,7 +33,7 @@ export const updateBuild = (buildId, build) => {
         body: JSON.stringify(build)
     }
 
-    return fetch(`${_apiUrl}/${buildId}`, putOptions)
+    return fetch(`${_apiUrl}/${build.id}`, putOptions)
 }
 
 export const deleteBuild = (buildId) => {
