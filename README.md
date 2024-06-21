@@ -3,8 +3,8 @@
 Choosing the parts for a new computer can be a stressful experience. You might be worried that your part selection doesn’t make sense, or that some parts might even be incompatible with each other.
 
 This website aims to solve these issues with a dual-pronged approach:
-- Built-in compatibility checking
 - A community that can suggest helpful changes
+- Built-in compatibility checking (Coming Soon)
 
 ## Technologies Used
 - ReactJS
