@@ -10,6 +10,7 @@ import { getCoolers } from "../../managers/coolerManager.js"
 import { getMemory } from "../../managers/memoryManager.js"
 import { getStorage } from "../../managers/storageManager.js"
 import { getMotherboards } from "../../managers/motherboardManager.js"
+import { getInterfaces } from "../../managers/interfaceManager.js"
 
 export const BuildForm = () => {
     const [cpus, setCPUs] = useState([])
@@ -19,6 +20,7 @@ export const BuildForm = () => {
     const [memory, setMemory] = useState([])
     const [storage, setStorage] = useState([])
     const [motherboards, setMotherboards] = useState([])
+    const [interfaces, setInterfaces] = useState([])
     const [build, setBuild] = useState(null)
     
     const { loggedInUser } = useAuthorizationProvider()
@@ -46,6 +48,7 @@ export const BuildForm = () => {
         getMemory().then(setMemory)
         getStorage().then(setStorage)
         getMotherboards().then(setMotherboards)
+        getInterfaces().then(setInterfaces)
         
         if (buildId) {
             getSingleBuildForEdit(buildId).then(buildObj => {
@@ -130,6 +133,36 @@ export const BuildForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault()
 
+        if (!isCPUCompatibleWithMotherboard(build.cpuId, build.motherboardId)) {
+            alert("Selected CPU is not compatible with the selected Motherboard")
+            return
+        }
+
+        if (!isGPUCompatibleWithMotherboard(build.gpuId, build.motherboardId)) {
+            alert("Selected GPU is not compatible with the selected Motherboard")
+            return
+        }
+
+        if (!isPowerSupplySufficient(build.psuId, calculateWattage())) {
+            alert("Selected Power Supply cannot supply enough power for selected components")
+            return
+        }
+
+        if (!isMemoryCompatibleWithMotherboard(build.buildMemories, build.motherboardId)) {
+            alert("Selected Memory is not compatible with the selected Motherboard")
+            return
+        }
+
+        if (!isSufficientM2StorageSlots(build.buildStorages, build.motherboardId)) {
+            alert("Selected too many M2 Storage Devices for the selected Motherboard")
+            return
+        }
+
+        if (!isSufficientSATAStorageSlots(build.buildStorages, build.motherboardId)) {
+            alert("Selected too many SATA Storage Devices for the selected Motherboard")
+            return
+        }
+
         const copy = {...build}
         copy.buildMemories = copy.buildMemories.map(bm => ({
             memoryId: bm.id,
@@ -145,6 +178,67 @@ export const BuildForm = () => {
         } else {
             updateBuild(copy).then(() => navigate(`/builds/${buildId}`))
         }
+    }
+
+    const isCPUCompatibleWithMotherboard = (cpuId, motherboardId) => {
+        if (!cpuId || !motherboardId) return true
+
+        const cpu = cpus.find(c => c.id == cpuId)
+        const motherboard = motherboards.find(mb => mb.id == motherboardId)
+
+        return cpu.interfaceId === motherboard.cpuInterfaceId
+    }
+
+    const isGPUCompatibleWithMotherboard = (gpuId, motherboardId) => {
+        if (!gpuId || ~motherboardId) return true
+
+        const gpu = gpus.find(g => g.id == gpuId)
+        const motherboard = motherboards.find(mb => mb.id == motherboardId)
+
+        return gpu.interfaceId === motherboard.gpuInterfaceId
+    }
+
+    const isSufficientM2StorageSlots = (storageModules, motherboardId) => {
+        if (!motherboardId) return true
+
+        const motherboard = motherboards.find(mb => mb.id == motherboardId)
+        const m2Interface = interfaces.find(i => i.name == "M.2 NVMe")
+        const m2Devices = storageModules.filter(sm => sm.interfaceId == m2Interface.id).reduce((sum, sm) => sum + sm.quantity, 0)
+
+        const isEnoughM2Slots = motherboard.m2StorageSlots >= m2Devices
+
+        return isEnoughM2Slots && isEnoughSATASlots
+    }
+
+    const isSufficientSATAStorageSlots = (storageModules, motherboardId) => {
+        if (!motherboardId) return true
+
+        const motherboard = motherboards.find(mb => mb.id == motherboardId)
+        const sataInterface = interfaces.find(i => i.name == "SATA")
+        const sataDevices = storageModules.filter(sm => sm.interfaceId == sataInterface.id).reduce((sum, sm) => sum + sm.quantity, 0)
+
+        const isEnoughSATASlots = motherboard.sataStorageSlots >= sataDevices
+
+        return isEnoughM2Slots && isEnoughSATASlots
+    }
+
+    const isMemoryCompatibleWithMotherboard = (memoryModules, motherboardId) => {
+        if (!motherboardId) return true
+
+        const motherboard = motherboards.find(mb => mb.id == motherboardId)
+
+        const isCompatible = memoryModules.every(mm => mm.interfaceId === motherboard.memoryInterfaceId)
+        const totalModules = memoryModules.reduce((sum, mm) => sum + (mm.quantity * 2), 0)
+
+        return isCompatible && totalModules <= motherboard.memorySlots
+    }
+
+    const isPowerSupplySufficient = (psuId, totalWattage) => {
+        if (!psuId) return true
+
+        const psu = psus.find(p => p.id == psuId)
+
+        return psu.wattage >= totalWattage
     }
 
     const calculateTotal = () => {
