@@ -1,5 +1,5 @@
-import { Box, Button, CircularProgress, Container, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
+import { Box, Button, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
@@ -22,6 +22,20 @@ export const BuildForm = () => {
     const [motherboards, setMotherboards] = useState([])
     const [interfaces, setInterfaces] = useState([])
     const [build, setBuild] = useState(null)
+
+    const [cpuError, setCPUError] = useState("")
+    const [gpuError, setGPUError] = useState("")
+    const [psuError, setPSUError] = useState("")
+    const [coolerError, setCoolerError] = useState("")
+    const [memoryError, setMemoryError] = useState("")
+    const [storageError, setStorageError] = useState("")
+
+    const cpuRef = useRef(null)
+    const gpuRef = useRef(null)
+    const psuRef = useRef(null)
+    const coolerRef = useRef(null)
+    const memoryRef = useRef(null)
+    const storageRef = useRef(null)
     
     const { loggedInUser } = useAuthorizationProvider()
     const { buildId } = useParams()
@@ -133,33 +147,64 @@ export const BuildForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault()
 
+        setCPUError("")
+        setGPUError("")
+        setPSUError("")
+        setCoolerError("")
+        setMemoryError("")
+        setStorageError("")
+
         if (!isCPUCompatibleWithMotherboard(build.cpuId, build.motherboardId)) {
-            alert("Selected CPU is not compatible with the selected Motherboard")
+            setCPUError("Selected CPU is not compatible with the selected Motherboard")
+            cpuRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
         if (!isGPUCompatibleWithMotherboard(build.gpuId, build.motherboardId)) {
-            alert("Selected GPU is not compatible with the selected Motherboard")
+            setGPUError("Selected GPU is not compatible with the selected Motherboard")
+            gpuRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
         if (!isPowerSupplySufficient(build.psuId, calculateWattage())) {
-            alert("Selected Power Supply cannot supply enough power for selected components")
+            setPSUError("Selected Power Supply cannot supply enough power for selected components")
+            psuRef.current.scrollIntoView({ behavior: "smooth" })
+            return
+        }
+
+        if (!isCoolerSufficient(build.coolerId, build.cpuId)) {
+            setCoolerError("Selected CPU Cooler cannot sufficiently cool the selected CPU")
+            coolerRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
         if (!isMemoryCompatibleWithMotherboard(build.buildMemories, build.motherboardId)) {
-            alert("Selected Memory is not compatible with the selected Motherboard")
+            setMemoryError("Selected Memory is not compatible with the selected Motherboard")
+            memoryRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
         if (!isSufficientM2StorageSlots(build.buildStorages, build.motherboardId)) {
-            alert("Selected too many M2 Storage Devices for the selected Motherboard")
+            setStorageError("Selected too many M2 Storage Devices for the selected Motherboard")
+            storageRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
         if (!isSufficientSATAStorageSlots(build.buildStorages, build.motherboardId)) {
-            alert("Selected too many SATA Storage Devices for the selected Motherboard")
+            setStorageError("Selected too many SATA Storage Devices for the selected Motherboard")
+            storageRef.current.scrollIntoView({ behavior: "smooth" })
+            return
+        }
+
+        if (build.buildMemories.length == 0) {
+            setMemoryError("No Memory selected")
+            memoryRef.current.scrollIntoView({ behavior: "smooth" })
+            return
+        }
+
+        if (build.buildStorages.length == 0) {
+            setStorageError("No Storage selected")
+            storageRef.current.scrollIntoView({ behavior: "smooth" })
             return
         }
 
@@ -205,9 +250,7 @@ export const BuildForm = () => {
         const m2Interface = interfaces.find(i => i.name == "M.2 NVMe")
         const m2Devices = storageModules.filter(sm => sm.interfaceId == m2Interface.id).reduce((sum, sm) => sum + sm.quantity, 0)
 
-        const isEnoughM2Slots = motherboard.m2StorageSlots >= m2Devices
-
-        return isEnoughM2Slots && isEnoughSATASlots
+        return motherboard.m2StorageSlots >= m2Devices
     }
 
     const isSufficientSATAStorageSlots = (storageModules, motherboardId) => {
@@ -217,9 +260,7 @@ export const BuildForm = () => {
         const sataInterface = interfaces.find(i => i.name == "SATA")
         const sataDevices = storageModules.filter(sm => sm.interfaceId == sataInterface.id).reduce((sum, sm) => sum + sm.quantity, 0)
 
-        const isEnoughSATASlots = motherboard.sataStorageSlots >= sataDevices
-
-        return isEnoughM2Slots && isEnoughSATASlots
+        return motherboard.sataStorageSlots >= sataDevices
     }
 
     const isMemoryCompatibleWithMotherboard = (memoryModules, motherboardId) => {
@@ -239,6 +280,15 @@ export const BuildForm = () => {
         const psu = psus.find(p => p.id == psuId)
 
         return psu.wattage >= totalWattage
+    }
+
+    const isCoolerSufficient = (coolerId, cpuId) => {
+        if (!coolerId || !cpuId) return true
+
+        const cooler = coolers.find(c => c.id == coolerId)
+        const cpu = cpus.find(c => c.id == cpuId)
+
+        return cooler.tdp >= cpu.tdp
     }
 
     const calculateTotal = () => {
@@ -302,7 +352,7 @@ export const BuildForm = () => {
                         onChange={e => setBuild({...build, content: e.target.value})}
                     />
                     <Typography variant="h5">Components</Typography>
-                    <FormControl>
+                    <FormControl required error={Boolean(cpuError)} ref={cpuRef} sx={{scrollMarginTop: "80px"}}>
                         <InputLabel>Processor</InputLabel>
                         <Select
                             label="Processor"
@@ -314,8 +364,9 @@ export const BuildForm = () => {
                                 <MenuItem value={c.id} key={`cpu-${c.id}`}>{c.name}</MenuItem>
                             ))}
                         </Select>
+                        {cpuError && <FormHelperText>{cpuError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(gpuError)} ref={gpuRef}>
                         <InputLabel>Graphics Card</InputLabel>
                         <Select
                             label="Graphics Card"
@@ -327,6 +378,7 @@ export const BuildForm = () => {
                                 <MenuItem value={g.id} key={`gpu-${g.id}`}>{g.name}</MenuItem>
                             ))}
                         </Select>
+                        {gpuError && <FormHelperText>{gpuError}</FormHelperText>}
                     </FormControl>
                     <FormControl>
                         <InputLabel>Motherboard</InputLabel>
@@ -341,7 +393,7 @@ export const BuildForm = () => {
                             ))}
                         </Select>
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(psuError)} ref={psuRef}>
                         <InputLabel>Power Supply</InputLabel>
                         <Select
                             label="Power Supply"
@@ -353,8 +405,9 @@ export const BuildForm = () => {
                                 <MenuItem value={p.id} key={`psu-${p.id}`}>{p.name}</MenuItem>
                             ))}
                         </Select>
+                        {psuError && <FormHelperText>{psuError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(coolerError)} ref={coolerRef}>
                         <InputLabel>CPU Cooler</InputLabel>
                         <Select
                             label="CPU Cooler"
@@ -366,9 +419,10 @@ export const BuildForm = () => {
                                 <MenuItem value={c.id} key={`cooler-${c.id}`}>{c.name}</MenuItem>
                             ))}
                         </Select>
+                        {coolerError && <FormHelperText>{coolerError}</FormHelperText>}
                     </FormControl>
                     <Stack direction={"row"} spacing={1}>
-                        <FormControl sx={{width: 1}}>
+                        <FormControl sx={{width: 1}}  required error={Boolean(memoryError)} ref={memoryRef}>
                             <InputLabel>Memory</InputLabel>
                             <Select label="Memory" value={0} onChange={e => handleMemorySelection(e.target.value)}>
                                 <MenuItem value={0} key={"memory-0"} disabled hidden>Choose a Memory Module</MenuItem>
@@ -380,8 +434,9 @@ export const BuildForm = () => {
                                     ))
                                 )}
                             </Select>
+                            {memoryError && <FormHelperText>{memoryError}</FormHelperText>}
                         </FormControl>
-                        <FormControl sx={{width: 1}}>
+                        <FormControl sx={{width: 1}} required error={Boolean(storageError)} ref={storageRef}>
                             <InputLabel>Storage</InputLabel>
                             <Select label="Storage" value={0} onChange={e => handleStorageSelection(e.target.value)}>
                                 <MenuItem value={0} key={"storage-0"} disabled hidden>Choose a Storage Device</MenuItem>
@@ -393,6 +448,7 @@ export const BuildForm = () => {
                                     ))
                                 )}
                             </Select>
+                            {storageError && <FormHelperText>{storageError}</FormHelperText>}
                         </FormControl>
                     </Stack>
                     {build.buildMemories.map(bm => (
