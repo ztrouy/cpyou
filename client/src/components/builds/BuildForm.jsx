@@ -1,5 +1,5 @@
 import { Alert, Box, Button, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Paper, Select, Snackbar, Stack, TextField, Typography } from "@mui/material"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
@@ -10,7 +10,6 @@ import { getCoolers } from "../../managers/coolerManager.js"
 import { getMemory } from "../../managers/memoryManager.js"
 import { getStorage } from "../../managers/storageManager.js"
 import { getMotherboards } from "../../managers/motherboardManager.js"
-import { getInterfaces } from "../../managers/interfaceManager.js"
 
 export const BuildForm = () => {
     const [cpus, setCPUs] = useState([])
@@ -20,7 +19,6 @@ export const BuildForm = () => {
     const [memory, setMemory] = useState([])
     const [storage, setStorage] = useState([])
     const [motherboards, setMotherboards] = useState([])
-    const [interfaces, setInterfaces] = useState([])
     const [build, setBuild] = useState(null)
 
     const [cpuError, setCPUError] = useState("")
@@ -65,7 +63,6 @@ export const BuildForm = () => {
         getMemory().then(setMemory)
         getStorage().then(setStorage)
         getMotherboards().then(setMotherboards)
-        getInterfaces().then(setInterfaces)
 
         setSnackbarState(initialSnackbar)
         
