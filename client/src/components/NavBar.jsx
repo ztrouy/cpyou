@@ -1,6 +1,7 @@
-import { AppBar, Box, Button, Toolbar } from "@mui/material"
+import { AppBar, Box, Button, ButtonBase, Toolbar } from "@mui/material"
 import { logout } from "../managers/authManager.js"
 import useAuthorizationProvider from "../shared/hooks/authorization/useAuthorizationProvider.js"
+import LogoWhite from "../assets/LogoWhite.svg"
 
 export const NavBar = () => {
     const { loggedInUser, setLoggedInUser } = useAuthorizationProvider()
@@ -14,7 +15,11 @@ export const NavBar = () => {
         <AppBar position="sticky">
             <Toolbar disableGutters sx={{justifyContent: "flex-end", pr: 1}}>
                 <Box flexGrow={1}>
-                    <Button sx={{color: "white", ml: 1}} href="/">CP&You</Button>
+                        <ButtonBase href="/">
+                            <Box sx={{ml: 2, mt: 0.5}}>
+                                <img src={LogoWhite} color="white" height={"30px"}/>
+                            </Box>
+                        </ButtonBase>
                 </Box>
                 {loggedInUser ? (
                     <>
