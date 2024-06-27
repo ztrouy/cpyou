@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Container, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from "@mui/material"
+import { Alert, Box, Button, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Paper, Select, Snackbar, Stack, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
@@ -20,6 +20,16 @@ export const BuildForm = () => {
     const [storage, setStorage] = useState([])
     const [motherboards, setMotherboards] = useState([])
     const [build, setBuild] = useState(null)
+
+    const [cpuError, setCPUError] = useState("")
+    const [gpuError, setGPUError] = useState("")
+    const [psuError, setPSUError] = useState("")
+    const [coolerError, setCoolerError] = useState("")
+    const [memoryError, setMemoryError] = useState("")
+    const [storageError, setStorageError] = useState("")
+    const [motherboardError, setMotherboardError] = useState("")
+
+    const [snackbarState, setSnackbarState] = useState({})
     
     const { loggedInUser } = useAuthorizationProvider()
     const { buildId } = useParams()
@@ -37,6 +47,13 @@ export const BuildForm = () => {
         buildMemories: [],
         buildStorages: []
     }
+
+    const initialSnackbar = {
+        open: false,
+        vertical: "top",
+        horizontal: "center",
+        message: ""
+    }
     
     useEffect(() => {
         getCPUs().then(setCPUs)
@@ -46,6 +63,8 @@ export const BuildForm = () => {
         getMemory().then(setMemory)
         getStorage().then(setStorage)
         getMotherboards().then(setMotherboards)
+
+        setSnackbarState(initialSnackbar)
         
         if (buildId) {
             getSingleBuildForEdit(buildId).then(buildObj => {
@@ -62,6 +81,7 @@ export const BuildForm = () => {
     }, [buildId])
     
     const handleMemorySelection = (e) => {
+        setMemoryError("")
         const copy = [...build.buildMemories]
         
         const foundMemory = memory.find(m => m.id == e)
@@ -81,6 +101,7 @@ export const BuildForm = () => {
     }
 
     const handleStorageSelection = (e) => {
+        setStorageError("")
         const copy = [...build.buildStorages]
         
         const foundStorage = storage.find(s => s.id == e)
@@ -100,6 +121,7 @@ export const BuildForm = () => {
     }
 
     const handleChangeMemoryQuantity = (chosenComponent, quantity) => {
+        setMemoryError("")
         const copy = [...build.buildMemories]
         let memoryCopy = copy.find(mc => mc == chosenComponent)
         
@@ -114,6 +136,7 @@ export const BuildForm = () => {
     }
 
     const handleChangeStorageQuantity = (chosenComponent, quantity) => {
+        setStorageError("")
         const copy = [...build.buildStorages]
         let storageCopy = copy.find(sc => sc == chosenComponent)
         
@@ -126,9 +149,41 @@ export const BuildForm = () => {
 
         setBuild({...build, buildStorages: copy})
     }
+
+    const handleOpenSnackbar = (messageText) => {
+        setSnackbarState({...snackbarState, open: true, message: messageText})
+    }
+
+    const handleCloseSnackbar = () => {
+        setSnackbarState({...snackbarState, open: false})
+    }
+
+    const handleErrors = (res) => {
+        if (!res.errors) {
+            handleOpenSnackbar(res)
+            return
+        }
+
+        setCPUError(res.errors.cpu.join(", "))
+        setGPUError(res.errors.gpu.join(", "))
+        setPSUError(res.errors.psu.join(", "))
+        setMotherboardError(res.errors.motherboard.join(", "))
+        setCoolerError(res.errors.cooler.join(", "))
+        setMemoryError(res.errors.memory.join(", "))
+        setStorageError(res.errors.storage.join(", "))
+        handleOpenSnackbar("Issues found with build")
+    }
     
     const handleSubmit = (e) => {
         e.preventDefault()
+
+        setCPUError("")
+        setGPUError("")
+        setPSUError("")
+        setCoolerError("")
+        setMemoryError("")
+        setStorageError("")
+        setMotherboardError("")
 
         const copy = {...build}
         copy.buildMemories = copy.buildMemories.map(bm => ({
@@ -141,9 +196,22 @@ export const BuildForm = () => {
         }))
 
         if (!buildId) {
-            createBuild(copy).then(url => navigate(url))
+            createBuild(copy).then(res => {
+                if (res.status === 201) {
+                    const url = res.headers.get("Location")
+                    navigate(url)
+                } else {
+                    res.json().then(errors => handleErrors(errors))
+                }
+            })
         } else {
-            updateBuild(copy).then(() => navigate(`/builds/${buildId}`))
+            updateBuild(copy).then(res => {
+                if (res.status === 204) {
+                    navigate(`/builds/${buildId}`)
+                } else {
+                    res.json().then(errors => handleErrors(errors))
+                }
+            })
         }
     }
 
@@ -208,73 +276,93 @@ export const BuildForm = () => {
                         onChange={e => setBuild({...build, content: e.target.value})}
                     />
                     <Typography variant="h5">Components</Typography>
-                    <FormControl>
+                    <FormControl required error={Boolean(cpuError)}>
                         <InputLabel>Processor</InputLabel>
                         <Select
                             label="Processor"
                             value={build.cpuId}
-                            onChange={e => setBuild({...build, cpuId: e.target.value})}
+                            onChange={e => {
+                                setBuild({...build, cpuId: e.target.value})
+                                setCPUError("")
+                            }}
                         >
                             <MenuItem value={0} key={"cpu-0"} disabled hidden>Choose a CPU</MenuItem>
                             {cpus.map(c => (
                                 <MenuItem value={c.id} key={`cpu-${c.id}`}>{c.name}</MenuItem>
                             ))}
                         </Select>
+                        {cpuError && <FormHelperText>{cpuError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(gpuError)}>
                         <InputLabel>Graphics Card</InputLabel>
                         <Select
                             label="Graphics Card"
                             value={build.gpuId}
-                            onChange={e => setBuild({...build, gpuId: e.target.value})}
+                            onChange={e => {
+                                setBuild({...build, gpuId: e.target.value})
+                                setGPUError("")
+                            }}
                         >
                             <MenuItem value={0} key={"gpu-0"} disabled hidden>Choose a GPU</MenuItem>
                             {gpus.map(g => (
                                 <MenuItem value={g.id} key={`gpu-${g.id}`}>{g.name}</MenuItem>
                             ))}
                         </Select>
+                        {gpuError && <FormHelperText>{gpuError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(motherboardError)}>
                         <InputLabel>Motherboard</InputLabel>
                         <Select
                             label="Motherboard"
                             value={build.motherboardId}
-                            onChange={e => setBuild({...build, motherboardId: e.target.value})}
+                            onChange={e => {
+                                setBuild({...build, motherboardId: e.target.value})
+                                setMotherboardError("")
+                            }}
                         >
                             <MenuItem value={0} key={"motherboard-0"} disabled hidden>Choose a Motherboard</MenuItem>
                             {motherboards.map(m => (
                                 <MenuItem value={m.id} key={`motherboard-${m.id}`}>{m.name}</MenuItem>
                             ))}
                         </Select>
+                        {motherboardError && <FormHelperText>{motherboardError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(psuError)}>
                         <InputLabel>Power Supply</InputLabel>
                         <Select
                             label="Power Supply"
                             value={build.psuId}
-                            onChange={e => setBuild({...build, psuId: e.target.value})}
+                            onChange={e => {
+                                setBuild({...build, psuId: e.target.value})
+                                setPSUError("")
+                            }}
                         >
                             <MenuItem value={0} key={"psu-0"} disabled hidden>Choose a PSU</MenuItem>
                             {psus.map(p => (
                                 <MenuItem value={p.id} key={`psu-${p.id}`}>{p.name}</MenuItem>
                             ))}
                         </Select>
+                        {psuError && <FormHelperText>{psuError}</FormHelperText>}
                     </FormControl>
-                    <FormControl>
+                    <FormControl required error={Boolean(coolerError)}>
                         <InputLabel>CPU Cooler</InputLabel>
                         <Select
                             label="CPU Cooler"
                             value={build.coolerId}
-                            onChange={e => setBuild({...build, coolerId: e.target.value})}
+                            onChange={e => {
+                                setBuild({...build, coolerId: e.target.value})
+                                setCoolerError("")
+                            }}
                         >
                             <MenuItem value={0} key={"cooler-0"} disabled hidden>Choose a CPU Cooler</MenuItem>
                             {coolers.map(c => (
                                 <MenuItem value={c.id} key={`cooler-${c.id}`}>{c.name}</MenuItem>
                             ))}
                         </Select>
+                        {coolerError && <FormHelperText>{coolerError}</FormHelperText>}
                     </FormControl>
                     <Stack direction={"row"} spacing={1}>
-                        <FormControl sx={{width: 1}}>
+                        <FormControl sx={{width: 1}}  required error={Boolean(memoryError)}>
                             <InputLabel>Memory</InputLabel>
                             <Select label="Memory" value={0} onChange={e => handleMemorySelection(e.target.value)}>
                                 <MenuItem value={0} key={"memory-0"} disabled hidden>Choose a Memory Module</MenuItem>
@@ -286,8 +374,9 @@ export const BuildForm = () => {
                                     ))
                                 )}
                             </Select>
+                            {memoryError && <FormHelperText>{memoryError}</FormHelperText>}
                         </FormControl>
-                        <FormControl sx={{width: 1}}>
+                        <FormControl sx={{width: 1}} required error={Boolean(storageError)}>
                             <InputLabel>Storage</InputLabel>
                             <Select label="Storage" value={0} onChange={e => handleStorageSelection(e.target.value)}>
                                 <MenuItem value={0} key={"storage-0"} disabled hidden>Choose a Storage Device</MenuItem>
@@ -299,6 +388,7 @@ export const BuildForm = () => {
                                     ))
                                 )}
                             </Select>
+                            {storageError && <FormHelperText>{storageError}</FormHelperText>}
                         </FormControl>
                     </Stack>
                     {build.buildMemories.map(bm => (
@@ -389,6 +479,15 @@ export const BuildForm = () => {
                     </Box>
                 </Box>
             </Paper>
+            <Snackbar open={snackbarState.open} autoHideDuration={4000} onClose={handleCloseSnackbar}>
+                <Alert
+                    severity="error"
+                    variant="filled"
+                    sx={{width: 1}}
+                >
+                    {snackbarState.message}
+                </Alert>
+            </Snackbar>
         </Container>
     )
 }
