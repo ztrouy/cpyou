@@ -316,7 +316,24 @@ public class BuildController : ControllerBase
         {
             return BadRequest("No User exists with that Id!");
         }
-        
+
+        BuildErrorsDTO errors = new BuildErrorsDTO();
+        bool errorsExist = false;
+
+        checkNewBuildHasRequiredComponents(build, ref errorsExist, ref errors);
+
+        if (errorsExist)
+        {
+            return BadRequest(new {errors});
+        }
+
+        checkNewBuildCompatability(build, ref errorsExist, ref errors);
+
+        if (errorsExist)
+        {
+            return BadRequest(new {errors});
+        }
+
         Build newBuild = new Build()
         {
             Name = build.Name,
@@ -470,6 +487,23 @@ public class BuildController : ControllerBase
         {
             return BadRequest("No Build exists with that Id!");
         }
+
+        BuildErrorsDTO errors = new BuildErrorsDTO();
+        bool errorsExist = false;
+
+        checkEditedBuildHasRequiredComponents(build, ref errorsExist, ref errors);
+
+        if (errorsExist)
+        {
+            return BadRequest(new {errors});
+        }
+
+        checkEditedBuildCompatability(build, ref errorsExist, ref errors);
+
+        if (errorsExist)
+        {
+            return BadRequest(new {errors});
+        }
         
         buildToEdit.Name = build.Name;
         buildToEdit.Content = build.Content;
@@ -543,4 +577,322 @@ public class BuildController : ControllerBase
 
         return NoContent();
     }
+
+    // Methods
+    private void checkNewBuildHasRequiredComponents(BuildCreateDTO build, ref bool errorsExist, ref BuildErrorsDTO errors)
+    {
+        if (build.CPUId == 0)
+        {
+            errors.CPU.Add("No CPU Selected");
+            errorsExist = true;
+        }
+
+        if (build.GPUId == 0)
+        {
+            errors.GPU.Add("No GPU Selected");
+            errorsExist = true;
+        }
+
+        if (build.PSUId == 0)
+        {
+            errors.PSU.Add("No PSU Selected");
+            errorsExist = true;
+        }
+
+        if (build.MotherboardId == 0)
+        {
+            errors.Motherboard.Add("No Motherboard Selected");
+            errorsExist = true;
+        }
+
+        if (build.CoolerId == 0)
+        {
+            errors.Cooler.Add("No Cooler Selected");
+            errorsExist = true;
+        }
+
+        if (build.BuildMemories.Count == 0)
+        {
+            errors.Memory.Add("No Memory Selected");
+            errorsExist = true;
+        }
+
+        if (build.BuildStorages.Count == 0)
+        {
+            errors.Storage.Add("No Storage Selected");
+            errorsExist = true;
+        }
+    }
+
+    private void checkNewBuildCompatability(BuildCreateDTO build, ref bool errorsExist, ref BuildErrorsDTO errors)
+    {
+        CPU foundCPU = _dbContext.CPUs.SingleOrDefault(c => c.Id == build.CPUId);
+        GPU foundGPU = _dbContext.GPUs.SingleOrDefault(g => g.Id == build.GPUId);
+        PSU foundPSU = _dbContext.PSUs.SingleOrDefault(p => p.Id == build.PSUId);
+        Cooler foundCooler = _dbContext.Coolers.SingleOrDefault(c => c.Id == build.CoolerId);
+        Motherboard foundMotherboard = _dbContext.Motherboards.SingleOrDefault(m => m.Id == build.MotherboardId);
+        
+        Interface m2Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "M.2 NVMe");
+        Interface sataInterface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "SATA");
+
+        List<Storage> foundM2Devices = new List<Storage>();
+        List<Storage> foundSATADevices = new List<Storage>();
+        foreach (BuildStorageCreateDTO bs in build.BuildStorages)
+        {
+            Storage foundStorage = _dbContext.Storages.SingleOrDefault(s => s.Id == bs.StorageId);
+            for (int i = 0; i < bs.Quantity; i++)
+            {
+                if (foundStorage.InterfaceId == m2Interface.Id) {
+                    foundM2Devices.Add(foundStorage);
+                } else if (foundStorage.InterfaceId == sataInterface.Id) {
+                    foundSATADevices.Add(foundStorage);
+                }
+            }
+        }
+
+        Interface ddr4Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "DDR4 DIMM");
+        Interface ddr5Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "DDR5 DIMM");
+
+        List<Memory> foundDDR4Modules = new List<Memory>();
+        List<Memory> foundDDR5Modules = new List<Memory>();
+        foreach (BuildMemoryCreateDTO bm in build.BuildMemories)
+        {
+            Memory foundMemory = _dbContext.Memories.SingleOrDefault(m => m.Id == bm.MemoryId);
+            for (int i = 0; i < bm.Quantity; i++)
+            {
+                if (foundMemory.InterfaceId == ddr4Interface.Id)
+                {
+                    foundDDR4Modules.Add(foundMemory);
+                    foundDDR4Modules.Add(foundMemory);
+                } else if (foundMemory.InterfaceId == ddr5Interface.Id)
+                {
+                    foundDDR5Modules.Add(foundMemory);
+                    foundDDR5Modules.Add(foundMemory);
+                }
+            }
+        }
+
+        {
+            if (foundCPU.InterfaceId != foundMotherboard.CPUInterfaceId)
+            {
+                errors.CPU.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support your CPU");
+                errorsExist = true;
+            }
+
+            if (foundGPU.InterfaceId != foundMotherboard.GPUInterfaceId)
+            {
+                errors.GPU.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support your GPU");
+                errorsExist = true;
+            }
+
+            if (foundPSU.Wattage < ((foundCPU.TDP + foundGPU.TDP) * 1.2))
+            {
+                errors.PSU.Add("Does not provide enough power for your Build");
+                errorsExist = true;
+            }
+
+            if (foundCooler.TDP < foundCPU.TDP)
+            {
+                errors.Cooler.Add("Does not dissipate enough heat for your CPU");
+                errors.CPU.Add("Produces too much heat for your Cooler");
+                errorsExist = true;
+            }
+
+            if (foundMotherboard.MemoryInterfaceId == ddr4Interface.Id & foundDDR5Modules.Count > 0)
+            {
+                errors.Memory.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support DDR5 Memory");
+                errorsExist = true;
+            }
+
+            if (foundMotherboard.MemoryInterfaceId == ddr5Interface.Id & foundDDR4Modules.Count > 0) 
+            {
+                errors.Memory.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support DDR4 Memory");
+                errorsExist = true;
+            }
+
+            if ((foundDDR4Modules.Count + foundDDR5Modules.Count) > foundMotherboard.MemorySlots)
+            {
+                errors.Memory.Add("Too many Memory modules selected");
+                errors.Motherboard.Add("Does not have enough Memory slots");
+                errorsExist = true;
+            }
+
+            if (foundM2Devices.Count > foundMotherboard.M2StorageSlots)
+            {
+                errors.Storage.Add("Too many M2 Storage Devices");
+                errors.Motherboard.Add("Does not have enough M2 Slots");
+                errorsExist = true;
+            }
+
+            if (foundSATADevices.Count > foundMotherboard.SataStorageSlots)
+            {
+                errors.Storage.Add("Too many SATA Storage Devices");
+                errors.Motherboard.Add("Does not have enough SATA Ports");
+                errorsExist = true;
+            }
+        }
+    }
+
+    private void checkEditedBuildHasRequiredComponents(BuildEditDTO build, ref bool errorsExist, ref BuildErrorsDTO errors)
+    {
+        if (build.CPUId == 0)
+        {
+            errors.CPU.Add("No CPU Selected");
+            errorsExist = true;
+        }
+
+        if (build.GPUId == 0)
+        {
+            errors.GPU.Add("No GPU Selected");
+            errorsExist = true;
+        }
+
+        if (build.PSUId == 0)
+        {
+            errors.PSU.Add("No PSU Selected");
+            errorsExist = true;
+        }
+
+        if (build.MotherboardId == 0)
+        {
+            errors.Motherboard.Add("No Motherboard Selected");
+            errorsExist = true;
+        }
+
+        if (build.CoolerId == 0)
+        {
+            errors.Cooler.Add("No Cooler Selected");
+            errorsExist = true;
+        }
+
+        if (build.BuildMemories.Count == 0)
+        {
+            errors.Memory.Add("No Memory Selected");
+            errorsExist = true;
+        }
+
+        if (build.BuildStorages.Count == 0)
+        {
+            errors.Storage.Add("No Storage Selected");
+            errorsExist = true;
+        }
+    }
+
+    private void checkEditedBuildCompatability(BuildEditDTO build, ref bool errorsExist, ref BuildErrorsDTO errors)
+    {
+        CPU foundCPU = _dbContext.CPUs.SingleOrDefault(c => c.Id == build.CPUId);
+        GPU foundGPU = _dbContext.GPUs.SingleOrDefault(g => g.Id == build.GPUId);
+        PSU foundPSU = _dbContext.PSUs.SingleOrDefault(p => p.Id == build.PSUId);
+        Cooler foundCooler = _dbContext.Coolers.SingleOrDefault(c => c.Id == build.CoolerId);
+        Motherboard foundMotherboard = _dbContext.Motherboards.SingleOrDefault(m => m.Id == build.MotherboardId);
+        
+        Interface m2Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "M.2 NVMe");
+        Interface sataInterface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "SATA");
+
+        List<Storage> foundM2Devices = new List<Storage>();
+        List<Storage> foundSATADevices = new List<Storage>();
+        foreach (BuildStorageCreateDTO bs in build.BuildStorages)
+        {
+            Storage foundStorage = _dbContext.Storages.SingleOrDefault(s => s.Id == bs.StorageId);
+            for (int i = 0; i < bs.Quantity; i++)
+            {
+                if (foundStorage.InterfaceId == m2Interface.Id) {
+                    foundM2Devices.Add(foundStorage);
+                } else if (foundStorage.InterfaceId == sataInterface.Id) {
+                    foundSATADevices.Add(foundStorage);
+                }
+            }
+        }
+
+        Interface ddr4Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "DDR4 DIMM");
+        Interface ddr5Interface = _dbContext.Interfaces.SingleOrDefault(i => i.Name == "DDR5 DIMM");
+
+        List<Memory> foundDDR4Modules = new List<Memory>();
+        List<Memory> foundDDR5Modules = new List<Memory>();
+        foreach (BuildMemoryCreateDTO bm in build.BuildMemories)
+        {
+            Memory foundMemory = _dbContext.Memories.SingleOrDefault(m => m.Id == bm.MemoryId);
+            for (int i = 0; i < bm.Quantity; i++)
+            {
+                if (foundMemory.InterfaceId == ddr4Interface.Id)
+                {
+                    foundDDR4Modules.Add(foundMemory);
+                    foundDDR4Modules.Add(foundMemory);
+                } else if (foundMemory.InterfaceId == ddr5Interface.Id)
+                {
+                    foundDDR5Modules.Add(foundMemory);
+                    foundDDR5Modules.Add(foundMemory);
+                }
+            }
+        }
+
+        {
+            if (foundCPU.InterfaceId != foundMotherboard.CPUInterfaceId)
+            {
+                errors.CPU.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support your CPU");
+                errorsExist = true;
+            }
+
+            if (foundGPU.InterfaceId != foundMotherboard.GPUInterfaceId)
+            {
+                errors.GPU.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support your GPU");
+                errorsExist = true;
+            }
+
+            if (foundPSU.Wattage < ((foundCPU.TDP + foundGPU.TDP) * 1.2))
+            {
+                errors.PSU.Add("Does not provide enough power for your Build");
+                errorsExist = true;
+            }
+
+            if (foundCooler.TDP < foundCPU.TDP)
+            {
+                errors.Cooler.Add("Does not dissipate enough heat for your CPU");
+                errors.CPU.Add("Produces too much heat for your Cooler");
+                errorsExist = true;
+            }
+
+            if (foundMotherboard.MemoryInterfaceId == ddr4Interface.Id & foundDDR5Modules.Count > 0)
+            {
+                errors.Memory.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support DDR5 Memory");
+                errorsExist = true;
+            }
+
+            if (foundMotherboard.MemoryInterfaceId == ddr5Interface.Id & foundDDR4Modules.Count > 0) 
+            {
+                errors.Memory.Add("Not supported by your Motherboard");
+                errors.Motherboard.Add("Does not support DDR4 Memory");
+                errorsExist = true;
+            }
+
+            if ((foundDDR4Modules.Count + foundDDR5Modules.Count) > foundMotherboard.MemorySlots)
+            {
+                errors.Memory.Add("Too many Memory modules selected");
+                errors.Motherboard.Add("Does not have enough Memory slots");
+                errorsExist = true;
+            }
+
+            if (foundM2Devices.Count > foundMotherboard.M2StorageSlots)
+            {
+                errors.Storage.Add("Too many M2 Storage Devices");
+                errors.Motherboard.Add("Does not have enough M2 Slots");
+                errorsExist = true;
+            }
+
+            if (foundSATADevices.Count > foundMotherboard.SataStorageSlots)
+            {
+                errors.Storage.Add("Too many SATA Storage Devices");
+                errors.Motherboard.Add("Does not have enough SATA Ports");
+                errorsExist = true;
+            }
+        }
+    }
+
 }
