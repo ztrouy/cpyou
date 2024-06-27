@@ -74,7 +74,7 @@ export const BuildDetails = () => {
             <Box sx={{display: "flex", flexDirection: "row"}} key={`${keyName}-${component.id}`}>
                 <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, alignItems: "center", gap: 1}}>
                     <Chip label={component.quantity} size="small"/>
-                    <Typography>{component.name}</Typography>
+                    <Typography>{component.name} {component.sizeGB}GB</Typography>
                 </Box>
                 <Typography>{(component.price * component.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
             </Box>
