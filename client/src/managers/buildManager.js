@@ -25,7 +25,7 @@ export const createBuild = (build) => {
         body: JSON.stringify(build)
     }
 
-    return fetch(_apiUrl, postOptions).then(res => res.headers.get("Location"))
+    return fetch(_apiUrl, postOptions)
 }
 
 export const updateBuild = (build) => {
