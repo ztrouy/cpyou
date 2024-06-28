@@ -7,15 +7,15 @@ import Comment from "../comments/Comment.jsx"
 import useAuthorizationProvider from "../../shared/hooks/authorization/useAuthorizationProvider.js"
 import CommentModal from "../modals/CommentModal.jsx"
 import { createComment } from "../../managers/commentManager.js"
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 
 export const BuildDetails = () => {
     const [build, setBuild] = useState(null)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false)
+    
     const { loggedInUser } = useAuthorizationProvider()
-
     const { buildId } = useParams()
-
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -74,7 +74,7 @@ export const BuildDetails = () => {
             <Box sx={{display: "flex", flexDirection: "row"}} key={`${keyName}-${component.id}`}>
                 <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, alignItems: "center", gap: 1}}>
                     <Chip label={component.quantity} size="small"/>
-                    <Typography>{component.name} {component.sizeGB}GB</Typography>
+                    <Typography>{component.fullName}</Typography>
                 </Box>
                 <Typography>{(component.price * component.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
             </Box>
@@ -88,6 +88,11 @@ export const BuildDetails = () => {
     return (
         <Container sx={{py: 5}}>
             <Stack direction={"column"} alignItems={"center"}>
+                <Box width={1} maxWidth={"800px"} marginY={1}>
+                    <Button startIcon={<NavigateBeforeIcon/>} onClick={() => navigate("/builds")}>
+                        Back
+                    </Button>
+                </Box>
                 <Paper elevation={2} sx={{p: 3, width: 1, maxWidth: "800px"}}>
                     <Typography variant="h4">{build.name}</Typography>
                     <Box sx={{my: 2}}>
