@@ -1,4 +1,4 @@
-import { Alert, Box, Button, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Paper, Select, Snackbar, Stack, TextField, Typography } from "@mui/material"
+import { Alert, Box, Button, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Paper, Select, Snackbar, Stack, Table, TableBody, TableCell, TableRow, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createBuild, getSingleBuildForEdit, updateBuild } from "../../managers/buildManager.js"
@@ -92,6 +92,7 @@ export const BuildForm = () => {
             interfaceId: foundMemory.interfaceId,
             price: foundMemory.price,
             sizeGB: foundMemory.sizeGB,
+            fullName: foundMemory.fullName,
             quantity: 1
         }
         
@@ -112,6 +113,7 @@ export const BuildForm = () => {
             interfaceId: foundStorage.interfaceId,
             price: foundStorage.price,
             sizeGB: foundStorage.sizeGB,
+            fullName: foundStorage.fullName,
             quantity: 1
         }
         
@@ -367,10 +369,10 @@ export const BuildForm = () => {
                             <Select label="Memory" value={0} onChange={e => handleMemorySelection(e.target.value)}>
                                 <MenuItem value={0} key={"memory-0"} disabled hidden>Choose a Memory Module</MenuItem>
                                 {build.buildMemories.length == 0 ? (
-                                    memory.map(m => <MenuItem value={m.id} key={`memory-${m.id}`}>{m.name} {m.sizeGB}GB</MenuItem>)
+                                    memory.map(m => <MenuItem value={m.id} key={`memory-${m.id}`}>{m.fullName}</MenuItem>)
                                 ) : (
                                     memory.filter(m => m.id != build.buildMemories.find(bm => bm.id == m.id)?.id).map(m => (
-                                        <MenuItem value={m.id} key={`memory-${m.id}`}>{m.name} {m.sizeGB}GB</MenuItem>
+                                        <MenuItem value={m.id} key={`memory-${m.id}`}>{m.fullName}</MenuItem>
                                     ))
                                 )}
                             </Select>
@@ -381,10 +383,10 @@ export const BuildForm = () => {
                             <Select label="Storage" value={0} onChange={e => handleStorageSelection(e.target.value)}>
                                 <MenuItem value={0} key={"storage-0"} disabled hidden>Choose a Storage Device</MenuItem>
                                 {build.buildMemories.length == 0 ? (
-                                    storage.map(s => <MenuItem value={s.id} key={`storage-${s.id}`}>{s.name} {s.sizeGB}GB</MenuItem>)
+                                    storage.map(s => <MenuItem value={s.id} key={`storage-${s.id}`}>{s.fullName}</MenuItem>)
                                 ) : (
                                     storage.filter(s => s.id != build.buildStorages.find(bs => bs.id == s.id)?.id).map(s => (
-                                        <MenuItem value={s.id} key={`storage-${s.id}`}>{s.name} {s.sizeGB}GB</MenuItem>
+                                        <MenuItem value={s.id} key={`storage-${s.id}`}>{s.fullName}</MenuItem>
                                     ))
                                 )}
                             </Select>
@@ -392,37 +394,37 @@ export const BuildForm = () => {
                         </FormControl>
                     </Stack>
                     {build.buildMemories.map(bm => (
-                        <Stack direction={"row"} key={`buildMemory-${bm.id}`}>
+                        <Stack direction={"row"} alignItems={"center"} spacing={1} key={`buildMemory-${bm.id}`}>
                             <Box display={"flex"} alignItems={"center"} flexGrow={1}>
-                                <Typography>{bm.name} {bm.sizeGB}GB</Typography>
+                                <Typography>{bm.fullName}</Typography>
                             </Box>
-                            <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <TextField 
                                     type="number"
                                     size="small"
                                     value={bm.quantity}
-                                    sx={{width: "60px"}}
+                                    sx={{width: "60px", minWidth: "60px"}}
                                     onChange={e => handleChangeMemoryQuantity(bm, e.target.value)}
                                 />
-                                <Typography>{(bm.price * bm.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
-                            </Stack>
+                                <Box width={"80px"} minWidth={"80px"}>
+                                    <Typography textAlign={"end"}>{(bm.price * bm.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
+                                </Box>
                         </Stack>
                     ))}
                     {build.buildStorages.map(bs => (
-                        <Stack direction={"row"} key={`buildStorage-${bs.id}`}>
+                        <Stack direction={"row"} alignItems={"center"} spacing={1} key={`buildStorage-${bs.id}`}>
                             <Box display={"flex"} alignItems={"center"} flexGrow={1}>
-                                <Typography>{bs.name} {bs.sizeGB}GB</Typography>
+                                <Typography>{bs.fullName}</Typography>
                             </Box>
-                            <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <TextField 
                                     type="number"
                                     size="small"
                                     value={bs.quantity}
-                                    sx={{width: "60px"}}
+                                    sx={{width: "60px", minWidth: "60px"}}
                                     onChange={e => handleChangeStorageQuantity(bs, e.target.value)}
                                 />
-                                <Typography>{(bs.price * bs.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
-                            </Stack>
+                                <Box width={"80px"} minWidth={"80px"}>
+                                    <Typography textAlign={"end"} width={"80px"}>{(bs.price * bs.quantity).toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
+                                </Box>
                         </Stack>
                     ))}
                     <Stack spacing={4} marginTop={1}>
