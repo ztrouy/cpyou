@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { tryGetLoggedInUser } from "./managers/authManager";
 import NavBar from "./components/NavBar";
 import ApplicationViews from "./components/ApplicationViews";
-import { CircularProgress, CssBaseline } from "@mui/material";
+import { CircularProgress, CssBaseline, ThemeProvider } from "@mui/material";
 import useAuthorizationProvider from "./shared/hooks/authorization/useAuthorizationProvider.js";
+import baseTheme from "./shared/hooks/theme/baseTheme.jsx";
 
 const App = () => {
     const { loggedInUser, setLoggedInUser } = useAuthorizationProvider()
@@ -21,10 +22,12 @@ const App = () => {
     }
 
     return (
-        <CssBaseline>
-            <NavBar/>
-            <ApplicationViews/>
-        </CssBaseline>
+        <ThemeProvider theme={baseTheme}>
+            <CssBaseline>
+                <NavBar/>
+                <ApplicationViews/>
+            </CssBaseline>
+        </ThemeProvider>
     );
 }
 

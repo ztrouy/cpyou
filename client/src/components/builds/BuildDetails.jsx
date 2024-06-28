@@ -87,70 +87,72 @@ export const BuildDetails = () => {
 
     return (
         <Container sx={{py: 5}}>
-            <Paper elevation={2} sx={{p: 3}}>
-                <Typography variant="h4">{build.name}</Typography>
-                <Box sx={{my: 2}}>
-                    <Typography>{build.userProfile.userName}</Typography>
-                    <Typography>{build.formattedDateCreated}</Typography>
-                </Box>
-                <Typography>{build.content}</Typography>
-                <Typography variant="h5" marginTop={2}>Parts</Typography>
-                <Stack direction={"column"} spacing={1} divider={<Divider orientation="horizontal" flexItem />}>
-                    <Box>
-                        <Typography variant="h6">CPU</Typography>
-                        {standardComponent(build.cpu)}
+            <Stack direction={"column"} alignItems={"center"}>
+                <Paper elevation={2} sx={{p: 3, width: 1, maxWidth: "800px"}}>
+                    <Typography variant="h4">{build.name}</Typography>
+                    <Box sx={{my: 2}}>
+                        <Typography>{build.userProfile.userName}</Typography>
+                        <Typography>{build.formattedDateCreated}</Typography>
                     </Box>
-                    <Box>
-                        <Typography variant="h6">GPU</Typography>
-                        {standardComponent(build.gpu)}
-                    </Box>
-                    <Box>
-                        <Typography variant="h6">PSU</Typography>
-                        {standardComponent(build.psu)}
-                    </Box>
-                    <Box>
-                        <Typography variant="h6">Motherboard</Typography>
-                        {standardComponent(build.motherboard)}
-                    </Box>
-                    <Box>
-                        <Typography variant="h6">Cooler</Typography>
-                        {standardComponent(build.cooler)}
-                    </Box>
-                    <Box paddingBottom={0.5}>
-                        <Typography variant="h6">Memory</Typography>
-                        <Stack spacing={1}>
-                            {build.memory.map(m => multiComponent(m, "memory"))}
-                        </Stack>
-                    </Box>
-                    <Box paddingBottom={0.5}>
-                        <Typography variant="h6">Storage</Typography>
-                        <Stack spacing={1}>
-                            {build.storage.map(s => multiComponent(s, "storage"))}
-                        </Stack>
-                    </Box>
-                    <Typography textAlign={"end"} fontWeight={"bold"} paddingTop={1}>{build.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
-                </Stack>
-                {build.userProfileId == loggedInUser.id && (
-                    <Stack direction={"row"} justifyContent={"end"} spacing={1} marginTop={2}>
-                        <Button variant="contained" onClick={() => navigate("edit")}>Edit</Button>
-                        <Button variant="contained" onClick={() => toggleDeleteModal()}>Delete</Button>
+                    <Typography>{build.content}</Typography>
+                    <Typography variant="h5" marginTop={2}>Parts</Typography>
+                    <Stack direction={"column"} spacing={1} divider={<Divider orientation="horizontal" flexItem />}>
+                        <Box>
+                            <Typography variant="h6">CPU</Typography>
+                            {standardComponent(build.cpu)}
+                        </Box>
+                        <Box>
+                            <Typography variant="h6">GPU</Typography>
+                            {standardComponent(build.gpu)}
+                        </Box>
+                        <Box>
+                            <Typography variant="h6">PSU</Typography>
+                            {standardComponent(build.psu)}
+                        </Box>
+                        <Box>
+                            <Typography variant="h6">Motherboard</Typography>
+                            {standardComponent(build.motherboard)}
+                        </Box>
+                        <Box>
+                            <Typography variant="h6">Cooler</Typography>
+                            {standardComponent(build.cooler)}
+                        </Box>
+                        <Box paddingBottom={0.5}>
+                            <Typography variant="h6">Memory</Typography>
+                            <Stack spacing={1}>
+                                {build.memory.map(m => multiComponent(m, "memory"))}
+                            </Stack>
+                        </Box>
+                        <Box paddingBottom={0.5}>
+                            <Typography variant="h6">Storage</Typography>
+                            <Stack spacing={1}>
+                                {build.storage.map(s => multiComponent(s, "storage"))}
+                            </Stack>
+                        </Box>
+                        <Typography textAlign={"end"} fontWeight={"bold"} paddingTop={1}>{build.totalPrice.toLocaleString("en-US", {style:"currency", currency:"USD"})}</Typography>
                     </Stack>
-                )}
-            </Paper>
-            <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
-                <Box sx={{display: "flex", flexDirection: "row", alignContent: "center", mt: 1, gap: 1}}>
-                    <Typography variant="h5" marginY={1}>Comments</Typography>
-                    <Box sx={{alignContent: "center", pt: 0.5}}>
-                        <Button onClick={() => toggleCommentModal()}>Comment</Button>
+                    {build.userProfileId == loggedInUser.id && (
+                        <Stack direction={"row"} justifyContent={"end"} spacing={1} marginTop={2}>
+                            <Button variant="contained" onClick={() => navigate("edit")}>Edit</Button>
+                            <Button variant="contained" onClick={() => toggleDeleteModal()}>Delete</Button>
+                        </Stack>
+                    )}
+                </Paper>
+                <Box sx={{display: "flex", flexDirection: "column", gap: 1, width: 1, maxWidth: "800px"}}>
+                    <Box sx={{display: "flex", flexDirection: "row", alignContent: "center", mt: 1, gap: 1}}>
+                        <Typography variant="h5" marginY={1}>Comments</Typography>
+                        <Box sx={{alignContent: "center", pt: 0.5}}>
+                            <Button onClick={() => toggleCommentModal()}>Comment</Button>
+                        </Box>
                     </Box>
+                    {build.comments?.map(c => (
+                        <Comment comment={c} refreshPage={refreshPage} key={`comment-${c.id}`}/>
+                    ))}
+                    {build.comments?.length == 0 && (
+                        <Typography textAlign={"center"}>There are no comments</Typography>
+                    )}
                 </Box>
-                {build.comments?.map(c => (
-                    <Comment comment={c} refreshPage={refreshPage} key={`comment-${c.id}`}/>
-                ))}
-                {build.comments?.length == 0 && (
-                    <Typography textAlign={"center"}>There are no comments</Typography>
-                )}
-            </Box>
+            </Stack>
             <DeleteModal 
                 isOpen={isDeleteModalOpen}
                 toggle={toggleDeleteModal}

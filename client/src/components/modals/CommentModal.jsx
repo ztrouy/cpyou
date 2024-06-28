@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogTitle, TextField } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 import { editComment } from "../../managers/commentManager"
 import { editReply } from "../../managers/replyManager"
@@ -93,7 +93,7 @@ export const CommentModal = ({ isOpen, toggle, submit, typeName, importForEdit }
     return (
         <Dialog open={isOpen} onClose={toggle} fullWidth>
             <DialogTitle>{importForEdit ? "Edit" : "Create"} {typeName}</DialogTitle>
-            <Box sx={{px: 2}}>
+            <DialogContent sx={{px: 2}}>
                 <TextField 
                     type="text"
                     placeholder={`Write ${typeName.toLowerCase()} here...`}
@@ -105,9 +105,8 @@ export const CommentModal = ({ isOpen, toggle, submit, typeName, importForEdit }
                     error={failedSubmit}
                     helperText={failedSubmit ? "Something went wrong, please try again" : ""}
                 />
-
-            </Box>
-            <DialogActions>
+            </DialogContent>
+            <DialogActions sx={{mr: 1, mt: -2}}>
                 <Button onClick={toggle}>Cancel</Button>
                 <Button onClick={handleSubmit}>Submit</Button>
             </DialogActions>
