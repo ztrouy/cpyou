@@ -21,4 +21,7 @@ public class BuildMemoryForEditFormDTO
 
     [Required]
     public int Quantity { get; set; }
+
+    // Calculated Properties
+    public string FullName => $"{Name} {SizeGB}GB";
 }

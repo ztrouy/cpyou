@@ -17,4 +17,7 @@ public class MemoryNoNavDTO
 
     [Required]
     public int SizeGB { get; set; }
+
+    // Calculated Properties
+    public string FullName => $"{Name} {SizeGB}GB";
 }

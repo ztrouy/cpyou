@@ -17,4 +17,18 @@ public class StorageNoNavDTO
 
     [Required]
     public int SizeGB { get; set; }
+
+    // Calculated Properties
+    public string FullName
+    {
+        get
+        {
+            if (SizeGB < 1000)
+            {
+                return $"{Name} {SizeGB}GB";
+            } else {
+                return $"{Name} {Math.Round((decimal)(SizeGB / 1000), 1)}TB";
+            }
+        }
+    }
 }
