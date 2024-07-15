@@ -4,7 +4,7 @@ Choosing the parts for a new computer can be a stressful experience. You might b
 
 This website aims to solve these issues with a dual-pronged approach:
 - A community that can suggest helpful changes
-- Built-in compatibility checking (Coming Soon)
+- Built-in compatibility checking
 
 ## Technologies Used
 - ReactJS
